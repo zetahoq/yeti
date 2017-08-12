@@ -6,6 +6,7 @@ from datetime import datetime
 
 from wtforms import widgets, Field, StringField
 from mongoengine import *
+from core.backends.mongo import BackendDocument
 from flask_mongoengine.wtf import model_form
 
 from core.constants import STORAGE_ROOT
@@ -36,7 +37,7 @@ class EntityListField(StringListField):
     endpoint = "api.Entity:index"
 
 
-class YetiDocument(Document):
+class YetiDocument(BackendDocument):
     meta = {
         "abstract": True,
     }
@@ -74,9 +75,9 @@ class YetiDocument(Document):
             return obj.save()
         except NotUniqueError:
             if hasattr(obj, 'name'):
-                return cls.objects.get(name=obj.name)
+                return cls.get(name=obj.name)
             if hasattr(obj, 'value'):
-                return cls.objects.get(value=obj.value)
+                return cls.get(value=obj.value)
 
 
 class LinkHistory(EmbeddedDocument):
@@ -144,7 +145,7 @@ class Link(Document):
         try:
             l = Link(src=src, dst=dst).save()
         except NotUniqueError:
-            l = Link.objects.get(src=src, dst=dst)
+            l = Link.get(src=src, dst=dst)
         return l
 
     def info(self):
@@ -234,7 +235,7 @@ class AttachedFile(YetiDocument):
         sha256 = stream_sha256(stream)
 
         try:
-            return AttachedFile.objects.get(sha256=sha256)
+            return AttachedFile.get(sha256=sha256)
         except DoesNotExist:
             # First, make sure the storage dir exists
             try:
@@ -293,7 +294,7 @@ class AttachedFile(YetiDocument):
 class Node(YetiDocument):
 
     exclude_fields = ['attached_files']
-    attached_files = ListField(ReferenceField(AttachedFile, reverse_delete_rule=PULL))
+    attached_files = ListField(ReferenceField("AttachedFile", reverse_delete_rule=PULL))
 
     meta = {
         "abstract": True,

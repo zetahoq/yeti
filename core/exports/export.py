@@ -88,12 +88,12 @@ class Export(ScheduleEntry):
     SCHEDULED_TASK = 'core.exports.export.execute_export'
     CUSTOM_FILTER = Q()
 
-    include_tags = ListField(ReferenceField(Tag, reverse_delete_rule=PULL))
-    exclude_tags = ListField(ReferenceField(Tag, reverse_delete_rule=PULL))
-    ignore_tags = ListField(ReferenceField(Tag, reverse_delete_rule=PULL))
+    include_tags = ListField(ReferenceField("Tag", reverse_delete_rule=PULL))
+    exclude_tags = ListField(ReferenceField("Tag", reverse_delete_rule=PULL))
+    ignore_tags = ListField(ReferenceField("Tag", reverse_delete_rule=PULL))
     output_dir = StringField(default='exports')
     acts_on = StringField(verbose_name="Acts on", required=True)
-    template = ReferenceField(ExportTemplate)
+    template = ReferenceField("ExportTemplate")
     hash_md5 = StringField(max_length=32)
 
     def __init__(self, *args, **kwargs):
