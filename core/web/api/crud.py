@@ -102,7 +102,7 @@ class CrudApi(FlaskView):
     def index(self):
         """List all corresponding entries in the database. **Do not use on large datasets!**
         """
-        objects = [o.info() for o in self.objectmanager.objects.all()]
+        objects = [o.info() for o in self.objectmanager.all()]
         return render(objects, template=self.template)
 
     # This method can be overridden if needed

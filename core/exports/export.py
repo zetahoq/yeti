@@ -52,14 +52,14 @@ class ExportTemplate(YetiDocument):
 def execute_export(export_id):
 
     try:
-        export = Export.objects.get(id=export_id, lock=None)  # check if we have implemented locking mechanisms
+        export = Export.get(id=export_id, lock=None)  # check if we have implemented locking mechanisms
     except DoesNotExist:
         try:
-            Export.objects.get(id=export_id, lock=False).modify(lock=True)  # get object and change lock
-            export = Export.objects.get(id=export_id)
+            Export.get(id=export_id, lock=False).modify(lock=True)  # get object and change lock
+            export = Export.get(id=export_id)
         except DoesNotExist:
             # no unlocked Export was found, notify and return...
-            logging.debug("Export {} is already running...".format(Export.objects.get(id=export_id).name))
+            logging.debug("Export {} is already running...".format(Export.get(id=export_id).name))
             return
 
     try:

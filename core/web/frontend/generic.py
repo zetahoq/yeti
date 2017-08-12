@@ -30,7 +30,7 @@ class GenericView(FlaskView):
 
     @requires_permissions("read")
     def get(self, id):
-        obj = self.klass.objects.get(id=id)
+        obj = self.klass.get(id=id)
         return render_template("{}/single.html".format(self.klass.__name__.lower()), obj=obj)
 
     @requires_permissions("write")
@@ -49,7 +49,7 @@ class GenericView(FlaskView):
 
         if 'bind' in request.args and request.args.get("type") in binding_object_classes:
             objtype = binding_object_classes[request.args.get("type")]
-            binding_obj = objtype.objects.get(id=request.args.get('bind'))
+            binding_obj = objtype.get(id=request.args.get('bind'))
             form = klass.get_form()(links=[binding_obj.name])
         else:
             form = klass.get_form()()
@@ -62,7 +62,7 @@ class GenericView(FlaskView):
     def edit(self, id):
         if request.method == "POST":
             return self.handle_form(id=id)
-        obj = self.klass.objects.get(id=id)
+        obj = self.klass.get(id=id)
         form_class = obj.__class__.get_form()
         form = form_class(obj=obj)
         return render_template("{}/edit.html".format(self.klass.__name__.lower()), form=form, obj_type=self.klass.__name__, obj=obj)
@@ -70,7 +70,7 @@ class GenericView(FlaskView):
     @requires_permissions("write")
     @route('/delete/<string:id>', methods=["GET"])
     def delete(self, id):
-        obj = self.klass.objects.get(id=id)
+        obj = self.klass.get(id=id)
         obj.delete()
         return redirect(url_for('frontend.{}:index'.format(self.__class__.__name__)))
 
@@ -85,7 +85,7 @@ class GenericView(FlaskView):
             obj = klass()
             form = klass.get_form()(request.form)
         else:  # update
-            obj = self.klass.objects.get(id=id)
+            obj = self.klass.get(id=id)
             klass = obj.__class__
             form = klass.get_form()(request.form, initial=obj._data)
 

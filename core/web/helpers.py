@@ -50,7 +50,7 @@ def requires_role(*roles):
 
 def get_object_or_404(klass, *args, **kwargs):
     try:
-        return klass.objects.get(*args, **kwargs)
+        return klass.get(*args, **kwargs)
     except:
         abort(404)
 

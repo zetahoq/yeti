@@ -18,14 +18,14 @@ from core.scheduling import ScheduleEntry
 def update_feed(feed_id):
 
     try:
-        f = Feed.objects.get(id=feed_id, lock=None)  # check if we have implemented locking mechanisms
+        f = Feed.get(id=feed_id, lock=None)  # check if we have implemented locking mechanisms
     except DoesNotExist:
         try:
-            Feed.objects.get(id=feed_id, lock=False).modify(lock=True)  # get object and change lock
-            f = Feed.objects.get(id=feed_id)
+            Feed.get(id=feed_id, lock=False).modify(lock=True)  # get object and change lock
+            f = Feed.get(id=feed_id)
         except DoesNotExist:
             # no unlocked Feed was found, notify and return...
-            logging.debug("Feed {} is already running...".format(Feed.objects.get(id=feed_id).name))
+            logging.debug("Feed {} is already running...".format(Feed.get(id=feed_id).name))
             return False
 
     try:

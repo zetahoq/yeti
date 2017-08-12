@@ -35,7 +35,7 @@ webapp.register_blueprint(auth_module.auth)
 @login_manager.user_loader
 def load_user(session_token):
     try:
-        return User.objects.get(session_token=session_token)
+        return User.get(session_token=session_token)
     except DoesNotExist:
         return None
 
@@ -43,7 +43,7 @@ def load_user(session_token):
 @login_manager.request_loader
 def api_auth(request):
     try:
-        return User.objects.get(api_key=request.headers.get('X-Api-Key'))
+        return User.get(api_key=request.headers.get('X-Api-Key'))
     except DoesNotExist:
         return None
 

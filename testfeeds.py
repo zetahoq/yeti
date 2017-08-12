@@ -16,7 +16,7 @@ if __name__ == '__main__':
 
     if len(sys.argv) > 1:
         name = sys.argv[1]
-        f = Feed.objects.get(name=name)
+        f = Feed.get(name=name)
         print "Running {}...".format(f.name)
         if update_feed(f.id):
             print "{}: success!".format(f.name)

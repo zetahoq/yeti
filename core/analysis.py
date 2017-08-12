@@ -110,7 +110,7 @@ def match_observables(observables, save_matches=False, fetch_neighbors=True):
             except ObservableValidationError:
                 pass
             try:
-                o = Observable.objects.get(value=o.value)
+                o = Observable.get(value=o.value)
             except Exception:
                 pass
 

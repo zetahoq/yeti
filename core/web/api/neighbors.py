@@ -28,7 +28,7 @@ class Neighbors(CrudApi):
     @requires_permissions('read')
     def get(self, klass, node_id):
         klass = NODES_CLASSES[klass.lower().split('.')[0]]
-        node = klass.objects.get(id=node_id)
+        node = klass.get(id=node_id)
 
         result = {
             'links': list(),
@@ -58,7 +58,7 @@ class Neighbors(CrudApi):
 
         klass = NODES_CLASSES[klass.lower().split('.')[0]]
         filter_class = NODES_CLASSES[type_filter.lower().split('.')[0]]
-        node = klass.objects.get(id=node_id)
+        node = klass.get(id=node_id)
 
         regex = bool(params.pop('regex', False))
         ignorecase = bool(params.pop('ignorecase', False))

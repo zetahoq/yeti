@@ -61,7 +61,7 @@ class File(CrudApi):
         :<id ObjectId corresponding to the file ObjectId
         """
         try:
-            fileobj = self.objectmanager.objects.get(id=id)
+            fileobj = self.objectmanager.get(id=id)
             return Response(fileobj.body.stream_contents(), mimetype=fileobj.mime_type)
         except DoesNotExist:
             abort(404)
@@ -74,7 +74,7 @@ class File(CrudApi):
         :<id ObjectId corresponding to the file ObjectId
         """
         try:
-            fileobj = self.objectmanager.objects.get(hashes__value=hash)
+            fileobj = self.objectmanager.get(hashes__value=hash)
             return Response(fileobj.body.stream_contents(), mimetype=fileobj.mime_type)
         except DoesNotExist:
             abort(404)

@@ -36,7 +36,7 @@ class Feed(CrudApi):
         :>json ObjectID id: The Analytics's ObjectID
         :>json boolean status: The result of the toggle operation (``true`` means the export has been enabled, ``false`` means it has been disabled)
         """
-        f = self.objectmanager.objects.get(id=id)
+        f = self.objectmanager.get(id=id)
         f.enabled = not f.enabled
         f.save()
         return render({"id": id, "status": f.enabled})

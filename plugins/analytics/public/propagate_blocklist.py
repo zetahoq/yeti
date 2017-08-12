@@ -26,5 +26,5 @@ class PropagateBlocklist(ScheduledAnalytics):
             for link in n[0]:
                 link[1].tag('blocklist')
         else:
-            h = ScheduledAnalytics.objects.get(name="ProcessUrl").each(obj)
+            h = ScheduledAnalytics.get(name="ProcessUrl").each(obj)
             h.tag('blocklist')

@@ -46,7 +46,7 @@ class Observable(CrudApi):
         params = request.json
 
         if 'id' in params:
-            obs = self.objectmanager.objects.get(id=params.pop("id"))
+            obs = self.objectmanager.get(id=params.pop("id"))
         else:
             if params.pop('refang', None):
                 obs = self.objectmanager.add_text(refang(params.pop('value')))
@@ -113,7 +113,7 @@ class Observable(CrudApi):
 
     @requires_permissions('write')
     def post(self, id):
-        obs = self.objectmanager.objects.get(id=id)
+        obs = self.objectmanager.get(id=id)
         j = request.json
         if not current_user.has_permission('observable', 'tag') and 'tags' in j:
             abort(401)

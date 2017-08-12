@@ -34,8 +34,8 @@ DEFAULT_PERMISSIONS = {
 def get_default_user():
     try:
         # Assume authentication is anonymous if only 1 user
-        if User.objects.count() < 2:
-            return User.objects.get(username="yeti")
+        if User.count() < 2:
+            return User.get(username="yeti")
         return AnonymousUserMixin()
     except DoesNotExist:
         return create_user("yeti", "yeti")
@@ -49,7 +49,7 @@ def create_user(username, password, permissions=DEFAULT_PERMISSIONS):
 
 def authenticate(username, password):
     try:
-        u = User.objects.get(username=username)
+        u = User.get(username=username)
         if check_password_hash(u.password, password):
             return u
         else:

@@ -33,7 +33,7 @@ class ObservableView(GenericView):
     @route('/advanced')
     @requires_permissions("read", "observable")
     def advanced(self):
-        return render_template("{}/browse.html".format(self.klass.__name__.lower()), export_templates=ExportTemplate.objects.all())
+        return render_template("{}/browse.html".format(self.klass.__name__.lower()), export_templates=ExportTemplate.all())
 
     # override to guess observable type
     @requires_permissions("write", "observable")

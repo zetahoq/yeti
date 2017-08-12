@@ -39,7 +39,7 @@ class ScheduledAnalytics(CrudApi):
         :>json ObjectID id: The Analytics's ObjectID
         :>json boolean status: The result of the toggle operation (``true`` means the export has been enabled, ``false`` means it has been disabled)
         """
-        a = self.objectmanager.objects.get(id=id)
+        a = self.objectmanager.get(id=id)
         a.enabled = not a.enabled
         a.save()
 
@@ -61,7 +61,7 @@ class InlineAnalytics(CrudApi):
         :>json ObjectID id: The Analytics's ObjectID
         :>json boolean status: The result of the toggle operation (``true`` means the export has been enabled, ``false`` means it has been disabled)
         """
-        a = self.objectmanager.objects.get(id=id)
+        a = self.objectmanager.get(id=id)
         a.enabled = not a.enabled
         a.save()
 
@@ -78,7 +78,7 @@ class OneShotAnalytics(CrudApi):
     def index(self):
         data = []
 
-        for obj in self.objectmanager.objects.all():
+        for obj in self.objectmanager.all():
             info = obj.info()
 
             info['available'] = True

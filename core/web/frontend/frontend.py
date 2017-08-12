@@ -57,7 +57,7 @@ SystemView.register(frontend)
 
 @frontend.route("/dataflows")
 def dataflows():
-    return render_template("dataflows.html", export_templates=ExportTemplate.objects.all())
+    return render_template("dataflows.html", export_templates=ExportTemplate.all())
 
 
 @frontend.route("/analytics")

@@ -19,12 +19,12 @@ def get_plugins():
             for name, obj in inspect.getmembers(module, inspect.isclass):
                 if issubclass(obj, PLUGIN_CLASSES) and obj.default_values is not None:
                     try:
-                        entry = obj.objects.get(name=obj.default_values['name'])
+                        entry = obj.get(name=obj.default_values['name'])
                     except DoesNotExist:
                         entry = obj(**obj.default_values)
                         entry.save()
 
-    for sched in ScheduleEntry.objects.all():
+    for sched in ScheduleEntry.all():
         entries[sched.name] = sched
 
     return entries

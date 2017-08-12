@@ -27,7 +27,7 @@ class Link(CrudApi):
         :query ObjectID id: Element ID
         :>json string deleted: The deleted element's ObjectID
         """
-        obj = self.objectmanager.objects.get(id=id)
+        obj = self.objectmanager.get(id=id)
         for i, inv in enumerate(Investigation.objects(links__id=id)):
             inv.modify({"links__id": id}, set__links__S__id="local-{}-{}".format(time.time(), i))
         obj.delete()

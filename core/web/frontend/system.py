@@ -108,7 +108,7 @@ class SystemView(FlaskView):
         if results['active']:
             for key in results['active']:
                 active[key] = {
-                    "running": [ScheduleEntry.objects.get(id=re.sub(r"[^0-9a-f]", "", i['args'])) for i in results["active"][key]],
+                    "running": [ScheduleEntry.get(id=re.sub(r"[^0-9a-f]", "", i['args'])) for i in results["active"][key]],
                 }
 
         return render_template(

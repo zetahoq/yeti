@@ -35,7 +35,7 @@ class Export(CrudApi):
         :resheader X-Yeti-Export-MD5: The MD5 hash of the exported content. Use it to check the export's integrity
         """
         try:
-            e = self.objectmanager.objects.get(id=id)
+            e = self.objectmanager.get(id=id)
         except DoesNotExist:
             return render({"error": "No Export found for id {}".format(id)}), 404
         if e.output_dir.startswith("/"):
@@ -71,7 +71,7 @@ class Export(CrudApi):
         :>json ObjectID id: The export's ObjectID
         :>json boolean status: The result of the toggle operation (``true`` means the export has been enabled, ``false`` means it has been disabled)
         """
-        e = self.objectmanager.objects.get(id=id)
+        e = self.objectmanager.get(id=id)
         e.enabled = not e.enabled
         e.save()
         return render({"id": id, "status": e.enabled})
@@ -79,8 +79,8 @@ class Export(CrudApi):
     def _parse_request(self, json):
         params = json
         params['frequency'] = string_to_timedelta(params.get('frequency', '1:00:00'))
-        params['ignore_tags'] = [Tag.objects.get(name=name.strip()) for name in params['ignore_tags'].split(',') if name.strip()]
-        params['include_tags'] = [Tag.objects.get(name=name.strip()) for name in params['include_tags'].split(',') if name.strip()]
-        params['exclude_tags'] = [Tag.objects.get(name=name.strip()) for name in params['exclude_tags'].split(',') if name.strip()]
-        params['template'] = exports.ExportTemplate.objects.get(name=params['template'])
+        params['ignore_tags'] = [Tag.get(name=name.strip()) for name in params['ignore_tags'].split(',') if name.strip()]
+        params['include_tags'] = [Tag.get(name=name.strip()) for name in params['include_tags'].split(',') if name.strip()]
+        params['exclude_tags'] = [Tag.get(name=name.strip()) for name in params['exclude_tags'].split(',') if name.strip()]
+        params['template'] = exports.ExportTemplate.get(name=params['template'])
         return params

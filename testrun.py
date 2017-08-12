@@ -111,20 +111,20 @@ print url.tags
 
 ## Create some instances of malware & co
 bartalex = Malware.get_or_create(name="Bartalex")
-bartalex.family = MalwareFamily.objects.get(name="dropper")
+bartalex.family = MalwareFamily.get(name="dropper")
 bartalex.killchain = "3"
 bartalex.tags = ["bartalex"]
 bartalex.save()
 
 dridex = Malware.get_or_create(name="Dridex")
 dridex.aliases = ["Cridex", "Drixed"]
-dridex.family = MalwareFamily.objects.get(name="banker")
+dridex.family = MalwareFamily.get(name="banker")
 dridex.killchain = "7"
 dridex.tags = ['dridex']
 dridex.save()
 
 zeus = Malware.get_or_create(name="Zeus")
-zeus.family = MalwareFamily.objects.get(name="banker")
+zeus.family = MalwareFamily.get(name="banker")
 zeus.killchain = "7"
 zeus.tags = ['zeus']
 zeus.save()

@@ -22,7 +22,7 @@ class TagLogic(ScheduledAnalytics):
     def __init__(self, *args, **kwargs):
         super(TagLogic, self).__init__(*args, **kwargs)
 
-        existing_tags = {t.name: (t.replaces, t.produces) for t in Tag.objects.all()}
+        existing_tags = {t.name: (t.replaces, t.produces) for t in Tag.all()}
         all_replacements = {}
         all_produces = {}
         for tag, (replaces, produces) in existing_tags.items():
@@ -50,7 +50,7 @@ class TagLogic(ScheduledAnalytics):
         # tag absent produced tags
         for tag in all_tags:
             try:
-                db_tag = Tag.objects.get(name=tag)
+                db_tag = Tag.get(name=tag)
                 produced_tags = db_tag.produces
                 obj.tag([t.name for t in produced_tags if t.name not in all_tags])
             except DoesNotExist:

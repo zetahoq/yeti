@@ -15,7 +15,7 @@ def authenticate(session):
 
 def get_or_create_user(saml_name_id, saml_user_data):
     try:
-        u = User.objects.get(username=saml_name_id)
+        u = User.get(username=saml_name_id)
     except DoesNotExist:
         u = create_user(saml_name_id, saml_user_data)
     return u

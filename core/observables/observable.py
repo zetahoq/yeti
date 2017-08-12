@@ -196,7 +196,7 @@ class Observable(Node):
         # find related tags and count them
         new_tags = {}
         for tag in self.tags:
-            tag = Tag.objects.get(name=tag.name)
+            tag = Tag.get(name=tag.name)
             for produces in tag.produces:
                 new_tags[produces] = new_tags.get(tag, 0) + 1
 
@@ -259,7 +259,7 @@ class Observable(Node):
                 new_tag.clean()
 
                 try:  # check if tag is a replacement
-                    tag = Tag.objects.get(replaces=new_tag.name)
+                    tag = Tag.get(replaces=new_tag.name)
                 except DoesNotExist:
                     tag = Tag.get_or_create(name=new_tag.name)
 
