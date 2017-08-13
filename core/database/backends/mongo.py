@@ -18,7 +18,6 @@ class Transform(SONManipulator):
         return son
 
 
-
 class MongoStore(object):
 
     def __init__(self, *args, **kwargs):
@@ -33,8 +32,6 @@ class MongoStore(object):
         self.db['internals'].create_index("name", unique=True)
 
 store = MongoStore()
-
-
 
 
 class BackendDocument(object):

@@ -6,7 +6,7 @@ from flask import url_for
 
 from core.database.database import Node
 from core.indicators import DIAMOND_EDGES
-from core.database.database import Node, EntityListField
+from core.database.fields import EntityListField
 
 class Indicator(Node):
 

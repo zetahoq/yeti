@@ -1,7 +1,7 @@
 from mongoengine import ListField, StringField
 
 from core.entities import Entity
-from core.database.database import StringListField
+from core.database.fields import StringListField
 
 
 class Campaign(Entity):
