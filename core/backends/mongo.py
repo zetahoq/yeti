@@ -34,27 +34,65 @@ class MongoStore(object):
 
 store = MongoStore()
 
-class BackendDocument(dict):
+
+
+
+class BackendDocument(object):
 
     collection_name = None
 
     def __init__(self, *args, **kwargs):
         # This is a pretty naive field loading / object construction
         # TODO think of a better way to do this. Maybe use a mongo SON manipulator?
-        for key, item in kwargs.items():
-            setattr(self, key, item)
+        self._id = kwargs.pop("_id", None)
+        for name in self._fields:
+            setattr(self, name, kwargs.get(name))
 
-    @classmethod
-    def get_collection(klass):
-        collection_name = klass.collection_name or klass.__name__.lower()
-        return store.db[collection_name]
+    def save(self):
+        if getattr(self, "_id"):
+            self.get_collection().replace_one({"_id": self._id}, self._to_bson())
+        else:
+            result = self.get_collection().insert_one(self._to_bson())
+            self._id = result.inserted_id
+
+        return self
+
+    def _to_bson(self):
+        bson = {}
+        for name in self._fields:
+            bson[name] = getattr(self, name)
+        return bson
+
+    def clean_update(self, **kwargs):
+        for key, value in kwargs.iteritems():
+            setattr(self, key, value)
+
+        self.validate()
+
+        update_dict = {}
+        for key, value in kwargs.iteritems():
+            update_dict[key] = getattr(self, key, value)
+
+        self.update(**update_dict)
+        self.reload()
+        return self
+
+    def add_to_set(self, field, value):
+        return self._set_update('$addToSet', field, value)
+
+    def remove_from_set(self, field, value):
+        return self._set_update('$pull', field, value)
+
+    def _set_update(self, method, field, value):
+        result = self.__class__.get_collection().update_one(
+            {'_id': self.pk}, {method: {field: value}})
+        return result.modified_count == 1
 
     @classmethod
     def get(klass, **kwargs):
         obj = klass.get_collection().find_one(kwargs)
         if obj:
             obj = klass(**obj)
-
         return obj
 
     @classmethod
@@ -64,15 +102,6 @@ class BackendDocument(dict):
     @classmethod
     def all(klass):
         return (o for o in klass.get_collection().find())
-
-    def save(self):
-        if "_id" in self:
-            self.get_collection().replace_one({"_id": self['_id']}, dict(self))
-        else:
-            result = self.get_collection().insert_one(dict(self))
-            self['_id'] = result.inserted_id
-
-        return self
 
     @classmethod
     def get_or_create(cls, **kwargs):
@@ -86,8 +115,7 @@ class BackendDocument(dict):
             if hasattr(obj, 'value'):
                 return cls.get(value=obj.value)
 
-    def __getattr__(self, name):
-        return dict(self).get(name, None)
-
-    def __setattr__(self, name, value):
-        self[name] = value
+    @classmethod
+    def get_collection(klass):
+        collection_name = klass.collection_name or klass.__name__.lower()
+        return store.db[collection_name]

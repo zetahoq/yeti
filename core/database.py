@@ -13,17 +13,22 @@ from core.constants import STORAGE_ROOT
 from core.helpers import iterify, stream_sha256
 
 
-class GenericField(object):
 
-    def __init__(self, unique=False):
+class BaseField(object):
+    db_field = None
+    name = None
+
+class GenericField(BaseField):
+
+    def __init__(self, default=None, unique=False):
         self.value = None
+        self._default = default
 
     def __get__(self, obj, objtype):
-        return self.value
+        return self.value or self._default
 
     def __set__(self, obj, value):
         self.value = value
-
 
 class StringListField(Field):
     widget = widgets.TextInput()
@@ -49,35 +54,60 @@ class EntityListField(StringListField):
     endpoint = "api.Entity:index"
 
 
+
+class YetiDocumentMetaClass(type):
+    def __new__(cls, name, bases, attrs):
+        flattened_bases = cls._get_bases(bases)
+
+        fields = {}
+
+        # Flatten fields
+        # Get fields in base classes
+        for base in flattened_bases:
+            if hasattr(base, '_fields'):
+                fields.update(base._fields)
+                continue
+            fields.update(cls._get_fields(base.__dict__))
+
+        # Get fields from own class
+        fields.update(cls._get_fields(attrs))
+
+        attrs['_fields'] = fields
+
+        return type.__new__(cls, name, bases, attrs)
+
+    @classmethod
+    def _get_bases(cls, bases):
+        seen = []
+        bases = cls.__recurse_bases(bases)
+        unique_bases = (b for b in bases if not (b in seen or seen.append(b)))
+        return unique_bases
+
+    @classmethod
+    def __recurse_bases(cls, bases):
+        for base in bases:
+            if base is object:
+                continue
+            yield base
+            for child_base in cls.__recurse_bases(base.__bases__):
+                yield child_base
+
+    @classmethod
+    def _get_fields(cls, class_dict):
+        _fields = {}
+        for attr_name, attr_value in class_dict.iteritems():
+            if not isinstance(attr_value, GenericField):
+                continue
+            attr_value.name = attr_name
+            if not attr_value.db_field:
+                attr_value.db_field = attr_name
+            _fields[attr_name] = attr_value
+        return _fields
+
+
 class YetiDocument(BackendDocument):
-    meta = {
-        "abstract": True,
-    }
-
-    def clean_update(self, **kwargs):
-        for key, value in kwargs.iteritems():
-            setattr(self, key, value)
-
-        self.validate()
-
-        update_dict = {}
-        for key, value in kwargs.iteritems():
-            update_dict[key] = getattr(self, key, value)
-
-        self.update(**update_dict)
-        self.reload()
-        return self
-
-    def _set_update(self, method, field, value):
-        result = self.__class__._get_collection().update_one({'_id': self.pk}, {method: {field: value}})
-
-        return result.modified_count == 1
-
-    def add_to_set(self, field, value):
-        return self._set_update('$addToSet', field, value)
-
-    def remove_from_set(self, field, value):
-        return self._set_update('$pull', field, value)
+    meta = {"abstract": True}
+    __metaclass__ = YetiDocumentMetaClass
 
 
 class LinkHistory(EmbeddedDocument):

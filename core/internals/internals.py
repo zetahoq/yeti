@@ -7,6 +7,9 @@ from core.constants import MIGRATIONS_DIRECTORY
 
 
 class Internals(YetiDocument):
+    db_version = GenericField(default=DB_VERSION)
+    name = GenericField(default="default")
+
     __internal = None
 
     @classmethod
