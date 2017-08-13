@@ -1,16 +1,12 @@
 import pkgutil
 import importlib
 
-from mongoengine import IntField, StringField
-
-from core.database import YetiDocument
+from core.database import YetiDocument, GenericField
 from core.constants import DB_VERSION
 from core.constants import MIGRATIONS_DIRECTORY
 
 
 class Internals(YetiDocument):
-    db_version = IntField(default=DB_VERSION)
-    name = StringField(default="default", unique=True)
     __internal = None
 
     @classmethod

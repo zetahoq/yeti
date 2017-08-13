@@ -13,6 +13,18 @@ from core.constants import STORAGE_ROOT
 from core.helpers import iterify, stream_sha256
 
 
+class GenericField(object):
+
+    def __init__(self, unique=False):
+        self.value = None
+
+    def __get__(self, obj, objtype):
+        return self.value
+
+    def __set__(self, obj, value):
+        self.value = value
+
+
 class StringListField(Field):
     widget = widgets.TextInput()
 
@@ -66,18 +78,6 @@ class YetiDocument(BackendDocument):
 
     def remove_from_set(self, field, value):
         return self._set_update('$pull', field, value)
-
-    @classmethod
-    def get_or_create(cls, **kwargs):
-        """Attempts to fetch a node in the database, and creates it if nonexistent"""
-        obj = cls(**kwargs)
-        try:
-            return obj.save()
-        except NotUniqueError:
-            if hasattr(obj, 'name'):
-                return cls.get(name=obj.name)
-            if hasattr(obj, 'value'):
-                return cls.get(value=obj.value)
 
 
 class LinkHistory(EmbeddedDocument):
