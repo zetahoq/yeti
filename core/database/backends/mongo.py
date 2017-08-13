@@ -4,27 +4,11 @@ from pymongo.son_manipulator import SONManipulator
 import pymongo.errors
 
 
-# Placeholder class for database SON manipulation
-class Transform(SONManipulator):
-    def transform_incoming(self, son, collection):
-        # This is where we would call save_to_json
-        for (key, value) in son.items():
-            if isinstance(value, dict):
-                son[key] = self.transform_incoming(value, collection)
-        return son
-
-    def transform_outgoing(self, son, collection):
-        # this is where we woudl call load_from_json
-        return son
-
-
 class MongoStore(object):
 
     def __init__(self, *args, **kwargs):
         self._connection = MongoClient(host=['localhost:27017'])
         self.db = self._connection['yeti-mongo']
-        # TODO: Find a smart way to do this
-        # self.db.add_son_manipulator(Transform())
         self.indexes()
 
     def indexes(self):
@@ -32,7 +16,6 @@ class MongoStore(object):
         self.db['internals'].create_index("name", unique=True)
 
 store = MongoStore()
-
 
 class BackendDocument(object):
 
