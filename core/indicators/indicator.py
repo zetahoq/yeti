@@ -4,9 +4,9 @@ from mongoengine import *
 from flask_mongoengine.wtf import model_form
 from flask import url_for
 
-from core.database import Node
+from core.database.database import Node
 from core.indicators import DIAMOND_EDGES
-from core.database import Node, EntityListField
+from core.database.database import Node, EntityListField
 
 class Indicator(Node):
 

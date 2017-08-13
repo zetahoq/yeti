@@ -1,7 +1,7 @@
 import pkgutil
 import importlib
 
-from core.database import YetiDocument, GenericField
+from core.database.database import YetiDocument, GenericField
 from core.constants import DB_VERSION
 from core.constants import MIGRATIONS_DIRECTORY
 

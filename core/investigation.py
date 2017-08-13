@@ -4,7 +4,7 @@ from bson.dbref import DBRef
 from datetime import datetime
 from mongoengine import *
 
-from core.database import YetiDocument
+from core.database.database import YetiDocument
 
 
 class InvestigationLink(EmbeddedDocument):

@@ -10,7 +10,7 @@ from mongoengine.errors import InvalidQueryError
 from core.web.api.api import render
 from core.web.helpers import get_queryset
 from core.helpers import iterify
-from core.database import AttachedFile
+from core.database.database import AttachedFile
 from core.web.helpers import get_object_or_404
 from core.web.helpers import requires_permissions
 

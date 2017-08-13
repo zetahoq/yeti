@@ -6,7 +6,7 @@ from mongoengine import StringField, DictField, BooleanField
 from flask_mongoengine.wtf import model_form
 from flask import url_for
 
-from core.database import YetiDocument
+from core.database.database import YetiDocument
 
 
 class User(YetiDocument):

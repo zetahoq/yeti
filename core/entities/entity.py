@@ -4,7 +4,7 @@ from mongoengine import StringField, ListField
 from flask_mongoengine.wtf import model_form
 from flask import url_for
 
-from core.database import Node, TagListField, EntityListField
+from core.database.database import Node, TagListField, EntityListField
 from core.observables import Tag
 
 

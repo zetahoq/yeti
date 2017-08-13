@@ -5,7 +5,7 @@ from mongoengine import *
 
 
 from core.observables import Observable
-from core.database import StringListField
+from core.database.database import StringListField
 
 
 class File(Observable):

@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from datetime import datetime
 
 from core.config.celeryctl import celery_app
-from core.database import YetiDocument
+from core.database.database import YetiDocument
 from core.scheduling import ScheduleEntry, OneShotEntry
 from core.observables import Observable
 from core.user import User

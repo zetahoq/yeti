@@ -7,7 +7,7 @@ from mongoengine import NotUniqueError
 from core.errors import GenericValidationError
 from core.entities import Malware, Company, TTP, Actor
 from core.indicators import Regex
-from core.database import AttachedFile
+from core.database.database import AttachedFile
 from core.web.helpers import get_object_or_404
 from core.web.helpers import requires_permissions
 

@@ -8,7 +8,7 @@ from celery.beat import ScheduleEntry as BaseScheduleEntry
 
 from core.config.celeryctl import celery_app
 from core.config.mongoengine_extras import TimeDeltaField
-from core.database import YetiDocument
+from core.database.database import YetiDocument
 
 
 class ScheduleEntry(YetiDocument):

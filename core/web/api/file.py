@@ -13,7 +13,7 @@ from core import observables
 from core.web.helpers import requires_permissions
 from core.web.api.api import render_json
 from core.helpers import stream_sha256
-from core.database import AttachedFile
+from core.database.database import AttachedFile
 
 
 def save_file(uploaded_file, filename=None):

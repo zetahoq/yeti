@@ -4,7 +4,7 @@ from mongoengine import connect
 
 from core.entities.malware import MalwareFamily, Malware
 from core.indicators import Regex, Indicator
-from core.database import Link
+from core.database.database import Link
 from core.entities import TTP, Exploit, ExploitKit
 from core.observables import Observable
 from core.observables import Tag

@@ -8,7 +8,7 @@ from bson.dbref import DBRef
 from mongoengine import QuerySet, Document, EmbeddedDocument
 
 from core.helpers import iterify
-from core.database import Node, Link, YetiDocument
+from core.database.database import Node, Link, YetiDocument
 
 def recursive_encoder(objects, template=None, ctx=None):
 

@@ -12,7 +12,7 @@ from jinja2 import Environment, FileSystemLoader
 from flask import url_for
 from mongoengine import DoesNotExist
 
-from core.database import YetiDocument
+from core.database.database import YetiDocument
 from core.config.celeryctl import celery_app
 from core.observables import Observable, Tag
 from core.scheduling import ScheduleEntry

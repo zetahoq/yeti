@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 from mongoengine import *
 
 from core.config.mongoengine_extras import TimeDeltaField
-from core.database import Node
+from core.database.database import Node
 from core.errors import TagValidationError
 from core.helpers import iterify
 

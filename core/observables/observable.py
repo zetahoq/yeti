@@ -8,7 +8,7 @@ from flask_mongoengine.wtf import model_form
 from flask import url_for
 
 from core.helpers import iterify
-from core.database import Node, TagListField
+from core.database.database import Node, TagListField
 from core.observables import ObservableTag, Tag
 from core.entities import Entity
 from core.errors import ObservableValidationError

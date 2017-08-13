@@ -6,12 +6,11 @@ from datetime import datetime
 
 from wtforms import widgets, Field, StringField
 from mongoengine import *
-from core.backends.mongo import BackendDocument
+from core.database.backends.mongo import BackendDocument
 from flask_mongoengine.wtf import model_form
 
 from core.constants import STORAGE_ROOT
 from core.helpers import iterify, stream_sha256
-
 
 
 class BaseField(object):

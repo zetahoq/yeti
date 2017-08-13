@@ -6,7 +6,7 @@ from bson.json_util import loads
 from flask import request
 
 from core.web.api.crud import CrudSearchApi, CrudApi
-from core import database
+from core.database import database
 from core.web.api.api import render
 from core.helpers import iterify
 from core.investigation import Investigation
