@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 import os
 
-from mongoengine import StringField, DictField, BooleanField
+from core.database.fields import StringField, DictField, BooleanField
 from flask_mongoengine.wtf import model_form
 from flask import url_for
 

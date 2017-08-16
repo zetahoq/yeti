@@ -1,7 +1,7 @@
 import pkgutil
 import inspect
 import importlib
-from mongoengine import DoesNotExist
+from core.database.errors import DoesNotExist
 
 from core.scheduling import ScheduleEntry, OneShotEntry
 from core.analytics import InlineAnalytics

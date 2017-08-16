@@ -3,6 +3,7 @@ from pymongo import MongoClient
 from pymongo.son_manipulator import SONManipulator
 import pymongo.errors
 
+from core.database.errors import DoesNotExist
 
 class MongoStore(object):
 
@@ -68,12 +69,17 @@ class BackendDocument(object):
             {'_id': self.pk}, {method: {field: value}})
         return result.modified_count == 1
 
+    @staticmethod
+    def get_from_collection(collection, **kwargs):
+        return store[collection].find_one(kwargs)
+
     @classmethod
     def get(klass, **kwargs):
         obj = klass.get_collection().find_one(kwargs)
         if obj:
-            obj = klass(**obj)
-        return obj
+            return klass(**obj)
+        else:
+            raise DoesNotExist
 
     @classmethod
     def count(klass):

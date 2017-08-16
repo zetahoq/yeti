@@ -2,14 +2,16 @@ from __future__ import unicode_literals
 
 from datetime import datetime
 
+from mongoengine import ReferenceField, ListField, DateTimeField, Q, Document
+from mongoengine import signals
+
 from core.config.celeryctl import celery_app
 from core.database.database import YetiDocument
 from core.scheduling import ScheduleEntry, OneShotEntry
 from core.observables import Observable
 from core.user import User
 from core.helpers import iterify
-from mongoengine import *
-from mongoengine import signals
+from core.database.fields import StringField, DictField, BooleanField
 
 
 class AnalyticsResults(Document):
@@ -36,7 +38,6 @@ class InlineAnalytics(YetiDocument):
 
     def __init__(self, *args, **kwargs):
         YetiDocument.__init__(self, *args, **kwargs)
-
         InlineAnalytics.analytics[self.name] = self
 
     @staticmethod

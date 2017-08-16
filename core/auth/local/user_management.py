@@ -7,7 +7,7 @@ from flask_login.mixins import AnonymousUserMixin
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from core.user import User
-from mongoengine import DoesNotExist
+from core.database.errors import DoesNotExist
 
 
 DEFAULT_PERMISSIONS = {
