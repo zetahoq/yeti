@@ -59,6 +59,8 @@ def obj_to_bson(obj):
         obj = {k: obj_to_bson(v) for k, v in obj.items()}
     if isinstance(obj, datetime.timedelta):
         obj = obj.total_seconds()
+    if isinstance(obj, BackendDocument):
+        obj = obj._to_bson()
     return obj
 
 
@@ -75,12 +77,21 @@ class BackendDocument(object):
 
     def save(self):
         if getattr(self, "_id"):
-            self.get_collection().replace_one({"_id": self._id}, self._to_bson())
+            bson = self._to_bson()
+            self.get_collection().replace_one({"_id": self._id}, bson)
         else:
             result = self.get_collection().insert_one(self._to_bson())
             self._id = result.inserted_id
 
         return self
+
+    def update(self, **kwargs):
+        modifiers = self._update_to_mongo(**kwargs)
+        result = self.get_collection().update_one({"_id": self._id}, modifiers)
+        return self.reload()
+
+    def reload(self):
+        return self.get(_id=self._id)
 
     @classmethod
     def _from_bson(klass, bson):

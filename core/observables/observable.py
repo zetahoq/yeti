@@ -128,7 +128,8 @@ class Observable(Node):
         old_tags = iterify(old_tags)
         for o in Observable.objects(tags__name__in=old_tags):
             for old_tag in old_tags:
-                o.change_tag(old_tag, new_tag)
+                if old_tag != new_tag:
+                    o.change_tag(old_tag, new_tag)
 
     def add_context(self, context, replace_source=None):
         """Adds context to an Observable.
@@ -217,14 +218,19 @@ class Observable(Node):
             return False
 
     def change_tag(self, old_tag, new_tag):
-        if not self.modify({"tags__name": old_tag, "tags__name__ne": new_tag}, set__tags__S__name=new_tag):
-            self.modify({"tags__name": old_tag}, pull__tags__name=old_tag)
-            self.modify({"tags__name": new_tag}, set__tags__S__last_seen=datetime.utcnow())
-        return self.reload()
+        if old_tag == new_tag:
+            return self
+        for t in self.tags:
+            if t.name == old_tag:
+                t.name = new_tag
+            return self.save()
 
     def untag(self, tags):
         for tag in iterify(tags):
-            self.modify(pull__tags__name=tag)
+            for i, t in enumerate(self.tags):
+                if t.name == tag:
+                    del self.tags[i]
+        self.save()
 
     def tag(self, new_tags, strict=False, expiration=None):
         """Tags an observable.
@@ -249,7 +255,9 @@ class Observable(Node):
         if strict:
             remove = set([t.name for t in self.tags]) - set(new_tags)
             for tag in remove:
-                self.modify(pull__tags__name=tag)
+                for i, t in enumerate(self.tags):
+                    if tag == t.name:
+                        del self.tags[i]
 
         tagged = False
         for new_tag in new_tags:
@@ -274,14 +282,18 @@ class Observable(Node):
                     self.active_link_to(e, 'Tagged', 'tags', clean_old=False)
 
                 for tag in extra_tags:
-                    if not self.modify({"tags__name": tag.name}, set__tags__S__fresh=True, set__tags__S__last_seen=datetime.utcnow()):
-                        self.modify(push__tags=ObservableTag(name=tag.name, expiration=expiration))
-                        tag.modify(inc__count=1)
+                    for t in self.tags:
+                        if t.name == tag.name:
+                            t.fresh = True
+                            t.last_seen = datetime.utcnow()
+                    else:
+                        otag = ObservableTag(name=tag.name, expiration=expiration)
+                        self.tags.append(otag)
 
         if tagged:
-            self.update(set__last_tagged=datetime.utcnow())
+            self.last_tagged = datetime.utcnow()
 
-        return self.reload()
+        return self.save()
 
     def get_last_tagged(self):
         if not self.last_tagged:

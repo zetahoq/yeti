@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 
 from mongoengine import *
 from core.database.fields import StringField, IntField, ListField, TimeDeltaField, DateTimeField
-from core.database.database import Node
+from core.database.database import Node, YetiDocument
 from core.errors import TagValidationError
 from core.helpers import iterify
 
@@ -50,7 +50,7 @@ class Tag(Node):
         self.produces = list(set(self.produces))
 
 
-class ObservableTag(EmbeddedDocument):
+class ObservableTag(YetiDocument):
 
     name = StringField(required=True)
     first_seen = DateTimeField(default=datetime.utcnow)
