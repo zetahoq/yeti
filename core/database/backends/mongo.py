@@ -4,6 +4,7 @@ from pymongo.son_manipulator import SONManipulator
 import pymongo.errors
 
 from core.database.errors import DoesNotExist
+import datetime
 
 class MongoStore(object):
 
@@ -38,10 +39,31 @@ class BackendDocument(object):
 
         return self
 
+    @classmethod
+    def _from_bson(klass, bson):
+        obj = klass()
+        for name, field in klass._fields.items():
+            value = bson.get(name)
+            from core.database.fields import TimeDeltaField
+            if isinstance(field, TimeDeltaField):
+                value = datetime.timedelta(seconds=value)
+            setattr(obj, name, value)
+
+        return obj
+
     def _to_bson(self):
         bson = {}
         for name in self._fields:
-            bson[name] = getattr(self, name)
+            value = getattr(self, name)
+            if isinstance(value, (list, tuple)):
+                value = [v._to_bson() for v in value]
+            if isinstance(value, (dict)):
+                value = {k: v._to_bson() for k, v in value.items()}
+            if isinstance(value, datetime.timedelta):
+                value = value.total_seconds()
+            bson[name] = value
+        print "Generating BSON object"
+        print bson
         return bson
 
     def clean_update(self, **kwargs):
@@ -70,14 +92,15 @@ class BackendDocument(object):
         return result.modified_count == 1
 
     @staticmethod
-    def get_from_collection(collection, **kwargs):
-        return store[collection].find_one(kwargs)
+    def get_from_collection(collection, id):
+        #TODO Need an index of classes to know which _from_bson method to call
+        return store[collection].find_one({"_id": id})
 
     @classmethod
     def get(klass, **kwargs):
         obj = klass.get_collection().find_one(kwargs)
         if obj:
-            return klass(**obj)
+            return klass._from_bson(obj)
         else:
             raise DoesNotExist
 
@@ -87,7 +110,7 @@ class BackendDocument(object):
 
     @classmethod
     def all(klass):
-        return (o for o in klass.get_collection().find())
+        return (klass._from_bson(obj) for obj in klass.get_collection().find())
 
     @classmethod
     def get_or_create(cls, **kwargs):

@@ -1,15 +1,12 @@
 import six
 from wtforms import widgets, Field
 
-from core.database.backends import store
 from core.database.backends import BackendDocument
 
 class BaseField(object):
     db_field = None
     name = None
 
-# TODO Implement to_python methods for every field to convert from bson to
-# python types
 class GenericField(BaseField):
 
     def __init__(self, default=None, unique=False, verbose_name=None, **kwargs):
@@ -18,42 +15,68 @@ class GenericField(BaseField):
         self._verbose = verbose_name
 
     def __get__(self, obj, objtype):
-        return self.value or self._default
+        if self.value is None and self._default is not None:
+            self.value = self._default
+        if callable(self.value):
+            return self.value()
+        return self.value
 
     def __set__(self, obj, value):
         self.value = value
 
 class StringField(GenericField):
+
+    def __init__(self, *args, **kwargs):
+        super(StringField, self).__init__(*args, **kwargs)
+
     def _validate(self):
         return isinstance(self.value, six.string_types)
 
 class IntField(GenericField):
+
+    def __init__(self, *args, **kwargs):
+        super(IntField, self).__init__(*args, **kwargs)
+
     def _validate(self):
         return isinstance(self.value, (int, long))
 
 class BooleanField(GenericField):
+
+    def __init__(self, *args, **kwargs):
+        super(BooleanField, self).__init__(*args, **kwargs)
+
     def _validate(self):
         return isinstance(self.value, bool)
 
 class DictField(GenericField):
-    # TODO recurse through values to convert them to python
+
+    def __init__(self, *args, **kwargs):
+        if 'default' not in kwargs:
+            kwargs['default'] = {}
+        super(DictField, self).__init__(*args, **kwargs)
+
     def _validate(self):
         return isinstance(self.value, dict)
 
 class ListField(GenericField):
-    # TODO recurs through values to convert them to python
+
     def __init__(self, *args, **kwargs):
-        self.value = []
+        if 'default' not in kwargs:
+            kwargs['default'] = []
+        super(ListField, self).__init__(*args, **kwargs)
 
     def _validate(self):
         return isinstance(self.value, (list, tuple))
 
 class ReferenceField(GenericField):
 
+    def __init__(self, *args, **kwargs):
+        super(ReferenceField, self).__init__(*args, **kwargs)
+
     def __get__(self, obj, objtype):
         collection = self.value['collection']
         _id = self.value['_id']
-        return BackendDocument.get_from_collection(collection, {"_id": _id})
+        return BackendDocument.get_from_collection(collection, _id)
 
     def __set__(self, obj, value):
         d = {
@@ -61,6 +84,18 @@ class ReferenceField(GenericField):
             "collection": value.collection_name,
         }
         self.value = d
+
+class EmbeddedDocumentField(GenericField):
+    def __init__(self, *args, **kwargs):
+        super(EmbeddedDocumentField, self).__init__(*args, **kwargs)
+
+class TimeDeltaField(GenericField):
+    def __init(self, *args, **kwargs):
+        super(TimeDeltaField, self).__init__(*args, **kwargs)
+
+class DateTimeField(GenericField):
+    def __init(self, *args, **kwargs):
+        super(DateTimeField, self).__init__(*args, **kwargs)
 
 # WTForms fields
 
