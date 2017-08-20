@@ -1,11 +1,10 @@
 from __future__ import unicode_literals
 
-from mongoengine import StringField, ListField
 from flask_mongoengine.wtf import model_form
 from flask import url_for
 
 from core.database.database import Node
-from core.database.fields import TagListField, EntityListField
+from core.database.fields import TagListField, EntityListField, StringField, ListField
 from core.observables import Tag
 
 
@@ -26,7 +25,7 @@ class Entity(Node):
 
     name = StringField(verbose_name="Name", required=True, unique=True, sparse=True, max_length=1024)
     description = StringField(verbose_name="Description")
-    tags = ListField(StringField(), verbose_name="Relevant tags")
+    tags = ListField(verbose_name="Relevant tags")
 
     meta = {
         "allow_inheritance": True,

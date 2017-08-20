@@ -1,10 +1,11 @@
-from pymongo import MongoClient
+import re
+import datetime
 
+from pymongo import MongoClient
 from pymongo.son_manipulator import SONManipulator
 import pymongo.errors
 
 from core.database.errors import DoesNotExist
-import datetime
 
 class MongoStore(object):
 
@@ -18,6 +19,48 @@ class MongoStore(object):
         self.db['internals'].create_index("name", unique=True)
 
 store = MongoStore()
+
+
+mongo_query_operators = [
+    "ne",
+    "lt",
+    "lte",
+    "gt",
+    "gte",
+    "not",
+    "in",
+    "nin",
+    "mod",
+    "all",
+    "size",
+    "exists",
+]
+
+mongo_update_operators = [
+    "set",
+    "unset",
+    "inc",
+    "dec",
+    "push",
+    "push_all",
+    "pop",
+    "pull",
+    "pull_all",
+    "add_to_set",
+]
+
+mongo_query_op_re = re.compile(r"\.(?P<op>{})$".format("|".join(mongo_query_operators)))
+mongo_update_op_re = re.compile(r"^(?P<op>{})\.".format("|".join(mongo_update_operators)))
+
+def obj_to_bson(obj):
+    if isinstance(obj, (list, tuple)):
+        obj = [obj_to_bson(v) for v in obj]
+    if isinstance(obj, (dict)):
+        obj = {k: obj_to_bson(v) for k, v in obj.items()}
+    if isinstance(obj, datetime.timedelta):
+        obj = obj.total_seconds()
+    return obj
+
 
 class BackendDocument(object):
 
@@ -55,15 +98,9 @@ class BackendDocument(object):
         bson = {}
         for name in self._fields:
             value = getattr(self, name)
-            if isinstance(value, (list, tuple)):
-                value = [v._to_bson() for v in value]
-            if isinstance(value, (dict)):
-                value = {k: v._to_bson() for k, v in value.items()}
-            if isinstance(value, datetime.timedelta):
-                value = value.total_seconds()
-            bson[name] = value
-        print "Generating BSON object"
-        print bson
+            bson[name] = obj_to_bson(value)
+        # print "Generating BSON object"
+        # print bson
         return bson
 
     def clean_update(self, **kwargs):
@@ -111,6 +148,47 @@ class BackendDocument(object):
     @classmethod
     def all(klass):
         return (klass._from_bson(obj) for obj in klass.get_collection().find())
+
+    @classmethod
+    def objects(klass, **kwargs):
+        mongo_query = klass._query_to_mongo(**kwargs)
+        return (klass.get_collection().find(mongo_query))
+
+    @classmethod
+    def _query_to_mongo(klass, **kwargs):
+        mongo_query = {}
+        for key, value in kwargs.items():
+            key = re.sub("__", ".", key)
+            opmatch = mongo_query_op_re.search(key)
+            if opmatch:
+                op = opmatch.group('op')
+                key = re.sub(r"\.{}$".format(op), "", key)
+                value = {"${}".format(op): value}
+            mongo_query[key] = obj_to_bson(value)
+        print "Generated mongo query", mongo_query
+        return mongo_query
+
+    @classmethod
+    def _update_to_mongo(klass, **kwargs):
+        mongo_update = {}
+        for key, value in kwargs.items():
+            key = re.sub("__", ".", key)
+            key = re.sub(".S.", ".$.", key)
+            opmatch = mongo_update_op_re.search(key)
+            if opmatch:
+                op = opmatch.group('op')
+                value = {re.sub(r"^{}\.".format(op), "", key): value}
+                key = "${}".format(op)
+            mongo_update[key] = obj_to_bson(value)
+        print "Generated mongo update", mongo_update
+        return mongo_update
+
+    @classmethod
+    def modify(klass, query, **kwargs):
+        query = klass._query_to_mongo(**query)
+        modifiers = klass._update_to_mongo(**kwargs)
+        result = klass.get_collection().update_many(query, modifiers)
+        return result.matched_count > 0
 
     @classmethod
     def get_or_create(cls, **kwargs):
