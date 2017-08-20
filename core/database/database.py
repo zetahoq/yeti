@@ -11,6 +11,7 @@ from flask_mongoengine.wtf import model_form
 from core.constants import STORAGE_ROOT
 from core.helpers import iterify, stream_sha256
 from core.database.fields import GenericField
+from core.database import register_class
 
 
 class YetiDocumentMetaClass(type):
@@ -32,7 +33,9 @@ class YetiDocumentMetaClass(type):
 
         attrs['_fields'] = fields
 
-        return type.__new__(cls, name, bases, attrs)
+        klass = type.__new__(cls, name, bases, attrs)
+        register_class(name, klass)
+        return klass
 
     @classmethod
     def _get_bases(cls, bases):

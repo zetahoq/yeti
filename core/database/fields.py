@@ -1,7 +1,9 @@
+
 import six
 from wtforms import widgets, Field
 
 from core.database.backends import BackendDocument
+from core.database import get_registered_class
 
 class BaseField(object):
     db_field = None
@@ -23,6 +25,12 @@ class GenericField(BaseField):
 
     def __set__(self, obj, value):
         self.value = value
+
+    @property
+    def get_class(self):
+        if isinstance(self._class, six.string_types):
+            self._class = get_registered_class(self._class)
+        return self._class
 
 class StringField(GenericField):
 

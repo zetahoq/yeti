@@ -105,10 +105,10 @@ class BackendDocument(object):
             if isinstance(field, TimeDeltaField):
                 value = datetime.timedelta(seconds=value)
             if isinstance(field, EmbeddedDocumentField):
-                value = field._class._from_bson(value)
+                value = field.get_class._from_bson(value)
             if isinstance(field, ListField):
                 if hasattr(field, "_class"):
-                    value = [field._class._from_bson(v) for v in value]
+                    value = [field.get_class._from_bson(v) for v in value]
             if isinstance(field, ReferenceField):
                 # Do something here, but what? Lazy loading?
                 pass
