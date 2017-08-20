@@ -1,4 +1,4 @@
-from mongoengine import ListField, StringField
+from core.database.fields import ListField, StringField
 
 from core.entities import Entity
 from core.database.fields import StringListField

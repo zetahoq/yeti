@@ -4,13 +4,12 @@ import re
 import os
 from datetime import datetime
 
-from mongoengine import *
 from core.database.backends.mongo import BackendDocument
 from flask_mongoengine.wtf import model_form
 
 from core.constants import STORAGE_ROOT
 from core.helpers import iterify, stream_sha256
-from core.database.fields import GenericField
+from core.database.fields import GenericField, StringField, DateTimeField, ListField, BooleanField, ReferenceField, EmbeddedDocumentField, IntField
 from core.database import register_class
 
 
@@ -71,7 +70,7 @@ class YetiDocument(BackendDocument):
     __metaclass__ = YetiDocumentMetaClass
 
 
-class LinkHistory(EmbeddedDocument):
+class LinkHistory(YetiDocument):
 
     description = StringField()
     first_seen = DateTimeField(default=datetime.utcnow)
@@ -80,7 +79,7 @@ class LinkHistory(EmbeddedDocument):
     active = BooleanField()
 
 
-class Link(Document):
+class Link(YetiDocument):
 
     src = ReferenceField("Node", required=True, dbref=True)
     dst = ReferenceField("Node", required=True, dbref=True, unique_with='src')
@@ -285,7 +284,7 @@ class AttachedFile(YetiDocument):
 class Node(YetiDocument):
 
     exclude_fields = ['attached_files']
-    attached_files = ListField(ReferenceField("AttachedFile", reverse_delete_rule=PULL))
+    attached_files = ListField(ReferenceField("AttachedFile"))
 
     meta = {
         "abstract": True,

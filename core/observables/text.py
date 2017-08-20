@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 
-from mongoengine import StringField
+from core.database.fields import StringField
 
 from core.observables import Observable
 

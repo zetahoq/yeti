@@ -12,11 +12,15 @@ class MongoStore(object):
     def __init__(self, *args, **kwargs):
         self._connection = MongoClient(host=['localhost:27017'])
         self.db = self._connection['yeti-mongo']
-        self.indexes()
+        self.index()
 
-    def indexes(self):
-        # TODO: See if we can build this with info from each class
+    def index(self):
+        # We could call this method from get_collection like Mongoengine does
+        # but for now let's stick to manual index creation
         self.db['internals'].create_index("name", unique=True)
+        self.db['observable'].create_index("value", unique=True)
+        self.db['entity'].create_index("name", unique=True)
+        # self.db['schedule_entry'].create_index("name", unique=True)
 
 store = MongoStore()
 
@@ -80,9 +84,11 @@ class BackendDocument(object):
             bson = self._to_bson()
             self.get_collection().replace_one({"_id": self._id}, bson)
         else:
-            result = self.get_collection().insert_one(self._to_bson())
-            self._id = result.inserted_id
-
+            try:
+                result = self.get_collection().insert_one(self._to_bson())
+                self._id = result.inserted_id
+            except pymongo.errors.DuplicateKeyError as e:
+                raise NotUniqueError
         return self
 
     def update(self, **kwargs):
@@ -122,8 +128,6 @@ class BackendDocument(object):
         for name in self._fields:
             value = getattr(self, name)
             bson[name] = obj_to_bson(value)
-        # print "Generating BSON object"
-        # print bson
         return bson
 
     def clean_update(self, **kwargs):
@@ -188,7 +192,6 @@ class BackendDocument(object):
                 key = re.sub(r"\.{}$".format(op), "", key)
                 value = {"${}".format(op): value}
             mongo_query[key] = obj_to_bson(value)
-        print "Generated mongo query", mongo_query
         return mongo_query
 
     @classmethod
@@ -203,7 +206,6 @@ class BackendDocument(object):
                 value = {re.sub(r"^{}\.".format(op), "", key): value}
                 key = "${}".format(op)
             mongo_update[key] = obj_to_bson(value)
-        print "Generated mongo update", mongo_update
         return mongo_update
 
     @classmethod

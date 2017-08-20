@@ -7,10 +7,11 @@ from datetime import datetime
 import traceback
 import hashlib
 
-from mongoengine import ListField, StringField, Q, ReferenceField, PULL
+from core.database.fields import ListField, StringField, ReferenceField
+from mongoengine import Q
 from jinja2 import Environment, FileSystemLoader
 from flask import url_for
-from mongoengine import DoesNotExist
+from core.database.errors import DoesNotExist
 
 from core.database.database import YetiDocument
 from core.config.celeryctl import celery_app
@@ -86,11 +87,11 @@ def execute_export(export_id):
 class Export(ScheduleEntry):
 
     SCHEDULED_TASK = 'core.exports.export.execute_export'
-    CUSTOM_FILTER = Q()
+    CUSTOM_FILTER = None
 
-    include_tags = ListField(ReferenceField("Tag", reverse_delete_rule=PULL))
-    exclude_tags = ListField(ReferenceField("Tag", reverse_delete_rule=PULL))
-    ignore_tags = ListField(ReferenceField("Tag", reverse_delete_rule=PULL))
+    include_tags = ListField(ReferenceField("Tag"))
+    exclude_tags = ListField(ReferenceField("Tag"))
+    ignore_tags = ListField(ReferenceField("Tag"))
     output_dir = StringField(default='exports')
     acts_on = StringField(verbose_name="Acts on", required=True)
     template = ReferenceField("ExportTemplate")

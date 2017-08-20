@@ -6,7 +6,7 @@ import zipfile
 from flask_classy import route
 from flask import request, Response, abort
 import magic
-from mongoengine import DoesNotExist
+from core.database.errors import DoesNotExist
 
 from core.web.api.crud import CrudApi
 from core import observables

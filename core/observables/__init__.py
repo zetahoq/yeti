@@ -1,5 +1,3 @@
-from mongoengine import *
-
 from core.observables.tag import ObservableTag, Tag
 from core.observables.observable import Observable
 from core.observables.ip import Ip

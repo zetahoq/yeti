@@ -15,7 +15,7 @@ class PropagateBlocklist(ScheduledAnalytics):
 
     ACTS_ON = 'Url'  # act on Urls only
 
-    CUSTOM_FILTER = Q(tags__name="blocklist")  # filter only tagged elements
+    CUSTOM_FILTER = {"tags__name": "blocklist"}  # filter only tagged elements
 
     EXPIRATION = None
 

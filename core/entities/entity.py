@@ -27,13 +27,7 @@ class Entity(Node):
     description = StringField(verbose_name="Description")
     tags = ListField(str, verbose_name="Relevant tags")
 
-    meta = {
-        "allow_inheritance": True,
-        "indexes": [
-            "tags"
-        ],
-        "ordering": ["name"],
-    }
+    collection_name = "entity"
 
     def clean(self):
         tags = []

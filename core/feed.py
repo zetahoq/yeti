@@ -7,8 +7,8 @@ import logging
 from StringIO import StringIO
 
 from lxml import etree
-from mongoengine import StringField
-from mongoengine import DoesNotExist
+from core.database.fields import StringField
+from core.database.errors import DoesNotExist
 
 from core.config.celeryctl import celery_app
 from core.scheduling import ScheduleEntry

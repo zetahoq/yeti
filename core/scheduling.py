@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 import logging
 
-from mongoengine import StringField, BooleanField, DateTimeField
+from core.database.fields import StringField, BooleanField, DateTimeField
 from celery.beat import Scheduler as BaseScheduler
 from celery.beat import ScheduleEntry as BaseScheduleEntry
 
@@ -29,8 +29,7 @@ class ScheduleEntry(YetiDocument):
     # This should be defined in subclasses, to set the field values
     default_values = None
 
-    meta = {"allow_inheritance": True}
-
+    collection_name = "schedule_entry"
     def update_status(self, status):
         self.status = status
         self.save()
@@ -48,8 +47,7 @@ class OneShotEntry(YetiDocument):
     # This should be defined in subclasses, to set the field values
     default_values = None
 
-    meta = {"allow_inheritance": True}
-
+    collection_name = 'one_shot_entry'
 
 class Scheduler(BaseScheduler):
 

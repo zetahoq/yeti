@@ -1,11 +1,9 @@
 from __future__ import unicode_literals
 
 from flask_mongoengine.wtf import model_form
-from mongoengine import *
 
-
+from core.database.fields import StringField, ListField, DictField, ReferenceField, StringListField
 from core.observables import Observable
-from core.database.fields import StringListField
 
 
 class File(Observable):

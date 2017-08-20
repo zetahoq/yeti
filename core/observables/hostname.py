@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 import re
 
 import idna
-from mongoengine import BooleanField, StringField
+from core.database.fields import BooleanField, StringField
 from tldextract import extract
 
 from core.observables import Observable

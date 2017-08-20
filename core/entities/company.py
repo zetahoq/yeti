@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 
-from mongoengine import DictField
+from core.database.fields import DictField
 
 from core.entities import Entity
 

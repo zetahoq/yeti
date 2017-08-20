@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 
-from mongoengine import StringField
+from core.database.fields import StringField
 import yara
 
 from core.indicators import Indicator

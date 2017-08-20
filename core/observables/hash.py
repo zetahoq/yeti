@@ -2,8 +2,7 @@ from __future__ import unicode_literals
 
 import re
 
-from mongoengine import *
-
+from core.database.fields import StringField
 from core.observables import Observable
 from core.errors import ObservableValidationError
 

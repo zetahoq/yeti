@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 from flask_classy import FlaskView, route
 from flask import render_template, request, redirect, url_for, abort
-from mongoengine import NotUniqueError
+from core.database.errors import NotUniqueError
 
 from core.errors import GenericValidationError
 from core.entities import Malware, Company, TTP, Actor

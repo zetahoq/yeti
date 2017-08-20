@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 import re
 from datetime import datetime, timedelta
 
-# from mongoengine import *
 from core.database.fields import StringField, IntField, ListField, TimeDeltaField, DateTimeField, BooleanField
 from core.database.database import Node, YetiDocument
 from core.errors import TagValidationError

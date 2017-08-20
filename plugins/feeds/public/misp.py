@@ -2,7 +2,7 @@ import logging
 import requests
 from csv import DictReader
 from urlparse import urljoin
-from mongoengine import DictField
+from core.database.fields import DictField
 from datetime import date, timedelta
 
 from core.feed import Feed

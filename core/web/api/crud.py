@@ -5,7 +5,6 @@ import logging
 from bson.json_util import loads
 from flask import request, url_for, abort, send_file, make_response
 from flask_classy import FlaskView, route
-from mongoengine.errors import InvalidQueryError
 
 from core.web.api.api import render
 from core.web.helpers import get_queryset
@@ -47,7 +46,7 @@ class CrudSearchApi(FlaskView):
 
         try:
             data = self.search(query)
-        except InvalidQueryError as e:
+        except Exception as e:
             logging.error(e)
             abort(400)
 

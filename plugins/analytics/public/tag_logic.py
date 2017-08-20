@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 from datetime import timedelta
 import logging
 
-from mongoengine import DoesNotExist
+from core.database.errors import DoesNotExist
 
 from core.analytics import ScheduledAnalytics
 from core.observables import Tag

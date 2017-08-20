@@ -9,7 +9,7 @@ from core.observables import Observable
 from core.config.celeryimports import loaded_modules
 from core.analytics import ScheduledAnalytics, AnalyticsResults
 
-from mongoengine import DoesNotExist
+from core.database.errors import DoesNotExist
 
 
 @celery_app.task

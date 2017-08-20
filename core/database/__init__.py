@@ -8,3 +8,6 @@ def get_registered_class(class_name):
 
 def register_class(class_name, klass):
     _class_registry[class_name] = klass
+
+def list_registered_classes():
+    return _class_registry.items()

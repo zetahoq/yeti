@@ -1,7 +1,5 @@
 from datetime import timedelta
 
-from mongoengine import connect
-
 from core.entities.malware import MalwareFamily, Malware
 from core.indicators import Regex, Indicator
 from core.database.database import Link

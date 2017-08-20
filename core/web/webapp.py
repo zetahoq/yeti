@@ -11,7 +11,7 @@ from core.user import User
 from core.web.json import JSONDecoder
 from core.web.api import api
 from core.web.frontend import frontend
-from mongoengine.errors import DoesNotExist
+from core.database.errors import DoesNotExist
 from core.yeti_plugins import get_plugins
 
 # Make sure plugins are loaded

@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 import re
 import hashlib
 import collections
-from mongoengine import Document
 from datetime import timedelta
 
 timedelta_regex = re.compile(r"(((?P<hours>[0-9]{1,2}):)?((?P<minutes>[0-9]{1,2}):))?(?P<seconds>[0-9]{1,2})$")
@@ -37,7 +36,7 @@ def del_from_set(s, value):
 def iterify(element):
     if element is None:
         return ()
-    elif isinstance(element, collections.Iterable) and not isinstance(element, basestring) and not isinstance(element, Document):
+    elif isinstance(element, collections.Iterable) and not isinstance(element, basestring) and not isinstance(element, YetiDocument):
         return element
     else:
         return (element,)

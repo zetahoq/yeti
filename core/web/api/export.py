@@ -4,7 +4,7 @@ import os
 
 from flask import send_from_directory, make_response
 from flask_classy import route
-from mongoengine.errors import DoesNotExist
+from core.database.errors import DoesNotExist
 
 from core.web.api.crud import CrudApi
 from core import exports

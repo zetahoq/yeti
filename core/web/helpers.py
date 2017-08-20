@@ -64,6 +64,9 @@ def find_method(instance, method_name, argument_name):
 
 
 def get_queryset(collection, filters, regex, ignorecase):
+    # TODO Maybe change the way the queryset is generated?
+    # There seems to be a to_query function we might be able to
+    # leverage
     result_filters = dict()
 
     queryset = collection.objects

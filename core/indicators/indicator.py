@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 
-from mongoengine import *
+from core.database.fields import StringField
 from flask_mongoengine.wtf import model_form
 from flask import url_for
 
@@ -20,10 +20,7 @@ class Indicator(Node):
     diamond = StringField(choices=DIAMOND_EDGES, required=True, verbose_name="Diamond Edge")
     description = StringField(verbose_name="Description")
 
-    meta = {
-        "allow_inheritance": True,
-        "ordering": ["name"],
-    }
+    collection_name = "indicator"
 
     @classmethod
     def get_form(klass):

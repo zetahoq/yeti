@@ -50,6 +50,8 @@ class Observable(Node):
 
     exclude_fields = ['sources', 'context', 'last_analyses', 'created', 'attached_files', 'last_tagged']
 
+    collection_name = "observable"
+
     meta = {
         "allow_inheritance": True,
         "indexes": [

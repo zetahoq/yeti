@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 import re
 
-from mongoengine import *
+from core.database.fields import DictField, IntField
 import iptools
 
 from core.observables import Observable

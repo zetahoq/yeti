@@ -2,12 +2,12 @@ from __future__ import unicode_literals
 
 from bson.dbref import DBRef
 from datetime import datetime
-from mongoengine import *
+from core.database.fields import StringField, ListField, DateTimeField, EmbeddedDocumentField, ReferenceField
 
 from core.database.database import YetiDocument
 
 
-class InvestigationLink(EmbeddedDocument):
+class InvestigationLink(YetiDocument):
     id = StringField(required=True)
     fromnode = StringField(required=True)
     tonode = StringField(required=True)
@@ -22,7 +22,7 @@ class InvestigationLink(EmbeddedDocument):
         return link
 
 
-class InvestigationEvent(EmbeddedDocument):
+class InvestigationEvent(YetiDocument):
     kind = StringField(required=True)
     links = ListField(EmbeddedDocumentField(InvestigationLink))
     nodes = ListField(ReferenceField('Node'))
@@ -39,6 +39,8 @@ class Investigation(YetiDocument):
     updated = DateTimeField(default=datetime.utcnow)
 
     SEARCH_ALIASES = {}
+
+    collection_name = "investigation"
 
     def info(self):
         result = self.to_mongo()

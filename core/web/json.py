@@ -5,7 +5,6 @@ from bson.json_util import default, object_hook as bson_hook
 import simplejson
 from bson.objectid import ObjectId
 from bson.dbref import DBRef
-from mongoengine import QuerySet, Document, EmbeddedDocument
 
 from core.helpers import iterify
 from core.database.database import Node, Link, YetiDocument
@@ -17,19 +16,16 @@ def recursive_encoder(objects, template=None, ctx=None):
             objects[key] = recursive_encoder(value)
         return objects
 
-    elif isinstance(objects, (list, QuerySet)):
+    elif isinstance(objects, list):
         return [recursive_encoder(o) for o in objects]
 
     elif isinstance(objects, tuple):
         return tuple(recursive_encoder(o) for o in objects)
 
-    elif isinstance(objects, (Node, Link, YetiDocument, Document, EmbeddedDocument)):
+    elif isinstance(objects, (Node, Link, YetiDocument)):
         if hasattr(objects, "info"):
             data = objects.info()
-        else:
-            data = objects.to_mongo()
         return data
-
     else:
         return objects
 

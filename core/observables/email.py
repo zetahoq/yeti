@@ -2,8 +2,6 @@ from __future__ import unicode_literals
 
 import re
 
-from mongoengine import *
-
 from core.observables import Observable
 
 class Email(Observable):

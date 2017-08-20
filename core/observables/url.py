@@ -4,7 +4,7 @@ import re
 from urlparse import urlparse
 
 import urlnorm
-from mongoengine import DictField
+from core.database.fields import DictField
 
 from core.observables import Observable
 from core.errors import ObservableValidationError

@@ -4,7 +4,6 @@ import json
 import hashlib
 import requests
 from pythonwhois.parse import parse_raw_whois
-from mongoengine import FieldDoesNotExist
 from datetime import datetime
 from tldextract import extract
 
@@ -26,9 +25,9 @@ def link_from_data(observable, data, path, klass, description):
     links = set()
 
     for value in iterify(data):
-        try:
+        if hasattr(klass, "value"):
             node = klass.get_or_create(value=value)
-        except FieldDoesNotExist:
+        else:
             node = klass.get_or_create(name=value)
 
         links.update(observable.active_link_to(node, description, 'DomainTools'))

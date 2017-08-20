@@ -1,7 +1,6 @@
 from __future__ import unicode_literals
 
-from mongoengine import *
-from flask_mongoengine.wtf import model_form
+from core.database.fields import ListField, StringField, StringListField
 
 from core.entities import Entity
 from core.database.fields import TagListField, StringListField

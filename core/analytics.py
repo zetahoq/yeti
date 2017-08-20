@@ -2,8 +2,8 @@ from __future__ import unicode_literals
 
 from datetime import datetime
 
-from mongoengine import ReferenceField, ListField, DateTimeField, Q, Document
-from mongoengine import signals
+from core.database.fields import ReferenceField, ListField, DateTimeField, DictField, StringField
+from mongoengine import signals, Q
 
 from core.config.celeryctl import celery_app
 from core.database.database import YetiDocument
@@ -14,7 +14,7 @@ from core.helpers import iterify
 from core.database.fields import StringField, DictField, BooleanField
 
 
-class AnalyticsResults(Document):
+class AnalyticsResults(YetiDocument):
     analytics = ReferenceField('OneShotAnalytics', required=True)
     observable = ReferenceField('Observable', required=True)
     status = StringField()
@@ -23,6 +23,8 @@ class AnalyticsResults(Document):
     raw = StringField()
     error = StringField()
     datetime = DateTimeField(default=datetime.utcnow)
+
+    collection_name = "analytics_results"
 
 
 class InlineAnalytics(YetiDocument):
@@ -34,7 +36,7 @@ class InlineAnalytics(YetiDocument):
     default_values = None
     analytics = {}
 
-    meta = {"allow_inheritance": True}
+    collection_name = "inline_analytics"
 
     def __init__(self, *args, **kwargs):
         YetiDocument.__init__(self, *args, **kwargs)
@@ -58,7 +60,7 @@ class InlineAnalytics(YetiDocument):
                     if analytics.enabled and sender.__name__ in iterify(analytics.ACTS_ON):
                         analytics.each(document)
 
-
+# TODO this will not work either
 signals.post_save.connect(InlineAnalytics.post_save)
 
 
@@ -66,9 +68,10 @@ class ScheduledAnalytics(ScheduleEntry):
     """Base class for analytics. All analytics must inherit from this"""
 
     SCHEDULED_TASK = 'core.analytics_tasks.schedule'
-    CUSTOM_FILTER = Q()
+    CUSTOM_FILTER = None
 
     def analyze_outdated(self):
+        #TODO this is completely broken, Q() does not exist anymore
         class_filter = Q()
         for acts_on in iterify(self.ACTS_ON):
             class_filter |= Q(_cls="Observable.{}".format(acts_on))

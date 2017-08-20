@@ -3,3 +3,6 @@ class BackendError(Exception):
 
 class DoesNotExist(BackendError):
     pass
+
+class NotUniqueError(BackendError):
+    pass
