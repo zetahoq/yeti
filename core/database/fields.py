@@ -60,10 +60,11 @@ class DictField(GenericField):
 
 class ListField(GenericField):
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, klass, *args, **kwargs):
         if 'default' not in kwargs:
             kwargs['default'] = []
         super(ListField, self).__init__(*args, **kwargs)
+        self._class = klass
 
     def _validate(self):
         return isinstance(self.value, (list, tuple))
@@ -72,9 +73,7 @@ class ReferenceField(GenericField):
 
     def __init__(self, reference_class, *args, **kwargs):
         super(ReferenceField, self).__init__(*args, **kwargs)
-        # TODO make some use of this? could be used to replace the
-        # collection querying below
-        self._reference_class = reference_class
+        self._class = reference_class
 
     def __get__(self, obj, objtype):
         collection = self.value['collection']
@@ -91,8 +90,7 @@ class ReferenceField(GenericField):
 class EmbeddedDocumentField(GenericField):
     def __init__(self, embedded_class, *args, **kwargs):
         super(EmbeddedDocumentField, self).__init__(*args, **kwargs)
-        # TODO make some use of this
-        self._embedded_class = embedded_class
+        self._class = embedded_class
 
 class TimeDeltaField(GenericField):
     def __init(self, *args, **kwargs):

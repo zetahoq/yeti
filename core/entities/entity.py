@@ -25,7 +25,7 @@ class Entity(Node):
 
     name = StringField(verbose_name="Name", required=True, unique=True, sparse=True, max_length=1024)
     description = StringField(verbose_name="Description")
-    tags = ListField(verbose_name="Relevant tags")
+    tags = ListField(str, verbose_name="Relevant tags")
 
     meta = {
         "allow_inheritance": True,

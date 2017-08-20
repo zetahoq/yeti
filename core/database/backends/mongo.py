@@ -99,8 +99,20 @@ class BackendDocument(object):
         for name, field in klass._fields.items():
             value = bson.get(name)
             from core.database.fields import TimeDeltaField
+            from core.database.fields import EmbeddedDocumentField
+            from core.database.fields import ListField
+            from core.database.fields import ReferenceField
             if isinstance(field, TimeDeltaField):
                 value = datetime.timedelta(seconds=value)
+            if isinstance(field, EmbeddedDocumentField):
+                value = field._class._from_bson(value)
+            if isinstance(field, ListField):
+                if hasattr(field, "_class"):
+                    value = [field._class._from_bson(v) for v in value]
+            if isinstance(field, ReferenceField):
+                # Do something here, but what? Lazy loading?
+                pass
+
             setattr(obj, name, value)
 
         return obj

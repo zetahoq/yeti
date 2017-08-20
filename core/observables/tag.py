@@ -3,8 +3,8 @@ from __future__ import unicode_literals
 import re
 from datetime import datetime, timedelta
 
-from mongoengine import *
-from core.database.fields import StringField, IntField, ListField, TimeDeltaField, DateTimeField
+# from mongoengine import *
+from core.database.fields import StringField, IntField, ListField, TimeDeltaField, DateTimeField, BooleanField
 from core.database.database import Node, YetiDocument
 from core.errors import TagValidationError
 from core.helpers import iterify
@@ -14,8 +14,8 @@ class Tag(Node):
     name = StringField(required=True, unique=True)
     count = IntField(required=True, default=0)
     created = DateTimeField(default=datetime.utcnow)
-    produces = ListField()
-    replaces = ListField()
+    produces = ListField("Tag")
+    replaces = ListField(str)
     default_expiration = TimeDeltaField(default=timedelta(days=90))
 
     meta = {
