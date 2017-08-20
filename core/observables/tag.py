@@ -4,8 +4,7 @@ import re
 from datetime import datetime, timedelta
 
 from mongoengine import *
-
-from core.config.mongoengine_extras import TimeDeltaField
+from core.database.fields import StringField, IntField, ListField, TimeDeltaField, DateTimeField
 from core.database.database import Node
 from core.errors import TagValidationError
 from core.helpers import iterify
@@ -15,8 +14,8 @@ class Tag(Node):
     name = StringField(required=True, unique=True)
     count = IntField(required=True, default=0)
     created = DateTimeField(default=datetime.utcnow)
-    produces = ListField(ReferenceField("Tag", reverse_delete_rule=PULL))
-    replaces = ListField(StringField())
+    produces = ListField()
+    replaces = ListField()
     default_expiration = TimeDeltaField(default=timedelta(days=90))
 
     meta = {

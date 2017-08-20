@@ -70,8 +70,11 @@ class ListField(GenericField):
 
 class ReferenceField(GenericField):
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, reference_class, *args, **kwargs):
         super(ReferenceField, self).__init__(*args, **kwargs)
+        # TODO make some use of this? could be used to replace the
+        # collection querying below
+        self._reference_class = reference_class
 
     def __get__(self, obj, objtype):
         collection = self.value['collection']
@@ -86,8 +89,10 @@ class ReferenceField(GenericField):
         self.value = d
 
 class EmbeddedDocumentField(GenericField):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, embedded_class, *args, **kwargs):
         super(EmbeddedDocumentField, self).__init__(*args, **kwargs)
+        # TODO make some use of this
+        self._embedded_class = embedded_class
 
 class TimeDeltaField(GenericField):
     def __init(self, *args, **kwargs):

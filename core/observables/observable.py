@@ -4,6 +4,7 @@ from datetime import datetime
 import operator
 
 from mongoengine import *
+from core.database.fields import StringField, ListField, DictField, EmbeddedDocumentField
 from flask_mongoengine.wtf import model_form
 from flask import url_for
 
@@ -13,6 +14,7 @@ from core.database.fields import TagListField
 from core.observables import ObservableTag, Tag
 from core.entities import Entity
 from core.errors import ObservableValidationError
+from core.database.errors import DoesNotExist
 
 
 class Observable(Node):
@@ -39,10 +41,10 @@ class Observable(Node):
     DISPLAY_FIELDS = [("value", "Value"), ("context", "Context"), ("tags", "Tags"), ("sources", "Sources"), ("created", "Created")]
 
     value = StringField(verbose_name="Value", required=True, unique=True, sparse=True, max_length=1024)
-    sources = ListField(StringField(), verbose_name="Sources")
+    sources = ListField(verbose_name="Sources")
     description = StringField(verbose_name="Description")
-    context = ListField(DictField(), verbose_name="Context")
-    tags = ListField(EmbeddedDocumentField(ObservableTag), verbose_name="Tags")
+    context = ListField(verbose_name="Context")
+    tags = ListField(verbose_name="Tags")
     last_analyses = DictField(verbose_name="Last analyses")
 
     created = DateTimeField(default=datetime.utcnow)
