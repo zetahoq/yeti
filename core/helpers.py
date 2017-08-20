@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import re
+import six
 import hashlib
 import collections
 from datetime import timedelta
@@ -36,7 +37,7 @@ def del_from_set(s, value):
 def iterify(element):
     if element is None:
         return ()
-    elif isinstance(element, collections.Iterable) and not isinstance(element, basestring) and not isinstance(element, YetiDocument):
+    elif isinstance(element, collections.Iterable) and not isinstance(element, six.string_types):
         return element
     else:
         return (element,)

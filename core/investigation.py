@@ -40,7 +40,7 @@ class Investigation(YetiDocument):
 
     SEARCH_ALIASES = {}
 
-    collection_name = "investigation"
+    _collection_name = "investigation"
 
     def info(self):
         result = self.to_mongo()

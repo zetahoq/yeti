@@ -24,7 +24,7 @@ class AnalyticsResults(YetiDocument):
     error = StringField()
     datetime = DateTimeField(default=datetime.utcnow)
 
-    collection_name = "analytics_results"
+    _collection_name = "analytics_results"
 
 
 class InlineAnalytics(YetiDocument):
@@ -36,7 +36,7 @@ class InlineAnalytics(YetiDocument):
     default_values = None
     analytics = {}
 
-    collection_name = "inline_analytics"
+    _collection_name = "inline_analytics"
 
     def __init__(self, *args, **kwargs):
         YetiDocument.__init__(self, *args, **kwargs)

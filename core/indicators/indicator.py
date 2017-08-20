@@ -20,7 +20,7 @@ class Indicator(Node):
     diamond = StringField(choices=DIAMOND_EDGES, required=True, verbose_name="Diamond Edge")
     description = StringField(verbose_name="Description")
 
-    collection_name = "indicator"
+    _collection_name = "indicator"
 
     @classmethod
     def get_form(klass):

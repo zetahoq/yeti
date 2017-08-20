@@ -1,5 +1,7 @@
 from datetime import timedelta
 
+from pymongo import MongoClient
+
 from core.entities.malware import MalwareFamily, Malware
 from core.indicators import Regex, Indicator
 from core.database.database import Link
@@ -9,20 +11,21 @@ from core.observables import Tag
 from core.exports import Export, ExportTemplate
 
 ## Clean slate
-db = connect('yeti')
-db.drop_database('yeti')
+client = MongoClient(host=['localhost:27017'])
+client.drop_database("yeti-mongo")
+db = client['yeti-mongo']
 
 ## Populate database with initial values
-mailer = MalwareFamily("mailer").save()
-banker = MalwareFamily("banker").save()
-worm = MalwareFamily("worm").save()
-ransomware = MalwareFamily("ransomware").save()
-backdoor = MalwareFamily("backdoor").save()
-stealer = MalwareFamily("stealer").save()
-passwordstealer = MalwareFamily("passwordstealer").save()
-rootkit = MalwareFamily("rootkit").save()
-trojan = MalwareFamily("trojan").save()
-dropper = MalwareFamily("dropper").save()
+mailer = MalwareFamily(name="mailer").save()
+banker = MalwareFamily(name="banker").save()
+worm = MalwareFamily(name="worm").save()
+ransomware = MalwareFamily(name="ransomware").save()
+backdoor = MalwareFamily(name="backdoor").save()
+stealer = MalwareFamily(name="stealer").save()
+passwordstealer = MalwareFamily(name="passwordstealer").save()
+rootkit = MalwareFamily(name="rootkit").save()
+trojan = MalwareFamily(name="trojan").save()
+dropper = MalwareFamily(name="dropper").save()
 
 # Malware
 e = ExploitKit(name="Angler").save()
@@ -74,12 +77,14 @@ e = Malware(name="Locky").save()
 e.family = ransomware
 e.save()
 
-
+exit() # Something bad happens after this.
 
 t1 = Tag.get_or_create(name="zeus").add_produces(["crimeware", "banker", "malware"])
 t2 = Tag.get_or_create(name="banker").add_produces(["crimeware", "malware"])
 t3 = Tag.get_or_create(name="c2")
 t3.add_replaces(["c&c", "cc"])
+
+
 
 Tag.get_or_create(name="crimeware").add_produces("malware")
 

@@ -27,7 +27,7 @@ class Entity(Node):
     description = StringField(verbose_name="Description")
     tags = ListField(str, verbose_name="Relevant tags")
 
-    collection_name = "entity"
+    _collection_name = "entity"
 
     def clean(self):
         tags = []

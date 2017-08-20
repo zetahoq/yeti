@@ -5,7 +5,7 @@ from pymongo import MongoClient
 from pymongo.son_manipulator import SONManipulator
 import pymongo.errors
 
-from core.database.errors import DoesNotExist
+from core.database.errors import DoesNotExist, NotUniqueError
 
 class MongoStore(object):
 
@@ -56,7 +56,7 @@ mongo_update_operators = [
 mongo_query_op_re = re.compile(r"\.(?P<op>{})$".format("|".join(mongo_query_operators)))
 mongo_update_op_re = re.compile(r"^(?P<op>{})\.".format("|".join(mongo_update_operators)))
 
-def obj_to_bson(obj):
+def obj_to_bson(obj, field=None):
     if isinstance(obj, (list, tuple)):
         obj = [obj_to_bson(v) for v in obj]
     if isinstance(obj, (dict)):
@@ -64,44 +64,48 @@ def obj_to_bson(obj):
     if isinstance(obj, datetime.timedelta):
         obj = obj.total_seconds()
     if isinstance(obj, BackendDocument):
-        obj = obj._to_bson()
+        from core.database.fields import ReferenceField
+        if isinstance(field, ReferenceField):
+            obj = obj._to_ref()
+        else:
+            obj = obj._to_bson()
     return obj
 
 
 class BackendDocument(object):
 
-    collection_name = None
-
     def __init__(self, *args, **kwargs):
         # This is a pretty naive field loading / object construction
         # TODO think of a better way to do this. Maybe use a mongo SON manipulator?
-        self._id = kwargs.pop("_id", None)
+        self.id = kwargs.pop("id", None)
         for name in self._fields:
-            setattr(self, name, kwargs.get(name))
+            if name in kwargs:
+                setattr(self, name, kwargs.get(name))
 
     def save(self):
-        if getattr(self, "_id"):
+        if getattr(self, "id"):
             bson = self._to_bson()
-            self.get_collection().replace_one({"_id": self._id}, bson)
+            self.get_collection().replace_one({"_id": self.id}, bson)
         else:
             try:
                 result = self.get_collection().insert_one(self._to_bson())
-                self._id = result.inserted_id
+                self.id = result.inserted_id
             except pymongo.errors.DuplicateKeyError as e:
                 raise NotUniqueError
         return self
 
     def update(self, **kwargs):
         modifiers = self._update_to_mongo(**kwargs)
-        result = self.get_collection().update_one({"_id": self._id}, modifiers)
+        result = self.get_collection().update_one({"_id": self.id}, modifiers)
         return self.reload()
 
     def reload(self):
-        return self.get(_id=self._id)
+        return self.get(_id=self.id)
 
     @classmethod
     def _from_bson(klass, bson):
         obj = klass()
+        obj.id = bson.pop("_id", None)
         for name, field in klass._fields.items():
             value = bson.get(name)
             from core.database.fields import TimeDeltaField
@@ -115,19 +119,23 @@ class BackendDocument(object):
             if isinstance(field, ListField):
                 if hasattr(field, "_class"):
                     value = [field.get_class._from_bson(v) for v in value]
-            if isinstance(field, ReferenceField):
-                # Do something here, but what? Lazy loading?
+            if isinstance(field, ReferenceField) and value:
+                # Lazy loading: don't load this object from the DB untill it's explicitly accessed
                 pass
 
             setattr(obj, name, value)
 
         return obj
 
+    def _to_ref(self):
+        return {"_id": self.id, "collection": self.collection_name()}
+
     def _to_bson(self):
         bson = {}
-        for name in self._fields:
+        for name, field in self._fields.items():
             value = getattr(self, name)
-            bson[name] = obj_to_bson(value)
+            bson[name] = obj_to_bson(value, field)
+        bson['_cls'] = self.__class__.__name__.lower()
         return bson
 
     def clean_update(self, **kwargs):
@@ -158,10 +166,11 @@ class BackendDocument(object):
     @staticmethod
     def get_from_collection(collection, id):
         #TODO Need an index of classes to know which _from_bson method to call
-        return store[collection].find_one({"_id": id})
+        return store.db[collection].find_one({"_id": id})
 
     @classmethod
     def get(klass, **kwargs):
+        kwargs["_cls"] = klass.__name__.lower()
         obj = klass.get_collection().find_one(kwargs)
         if obj:
             return klass._from_bson(obj)
@@ -170,15 +179,18 @@ class BackendDocument(object):
 
     @classmethod
     def count(klass):
-        return klass.get_collection().count()
+        fltr = {"_cls": klass.__name__.lower()}
+        return klass.get_collection().find(**fltr).count()
 
     @classmethod
     def all(klass):
-        return (klass._from_bson(obj) for obj in klass.get_collection().find())
+        fltr = {"_cls": klass.__name__.lower()}
+        return (klass._from_bson(obj) for obj in klass.get_collection().find(**fltr))
 
     @classmethod
     def objects(klass, **kwargs):
         mongo_query = klass._query_to_mongo(**kwargs)
+        mongo_query['_cls'] = klass.__name__.lower()
         return (klass.get_collection().find(mongo_query))
 
     @classmethod
@@ -212,22 +224,22 @@ class BackendDocument(object):
     def modify(klass, query, **kwargs):
         query = klass._query_to_mongo(**query)
         modifiers = klass._update_to_mongo(**kwargs)
+        query['_cls'] = klass.__name__.lower()
         result = klass.get_collection().update_many(query, modifiers)
         return result.matched_count > 0
 
     @classmethod
-    def get_or_create(cls, **kwargs):
+    def get_or_create(klass, **kwargs):
         """Attempts to save a node in the database, and loads it if duplicate"""
-        obj = cls(**kwargs)
+        obj = klass(**kwargs)
         try:
             return obj.save()
-        except pymongo.errors.DuplicateKeyError:
+        except NotUniqueError:
             if hasattr(obj, 'name'):
-                return cls.get(name=obj.name)
+                return klass.get(name=obj.name, _cls=klass.__name__.lower())
             if hasattr(obj, 'value'):
-                return cls.get(value=obj.value)
+                return klass.get(value=obj.value, _cls=klass.__name__.lower())
 
     @classmethod
     def get_collection(klass):
-        collection_name = klass.collection_name or klass.__name__.lower()
-        return store.db[collection_name]
+        return store.db[klass.collection_name()]

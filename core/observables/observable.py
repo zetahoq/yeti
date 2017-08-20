@@ -10,7 +10,6 @@ from core.helpers import iterify
 from core.database.fields import StringField, ListField, DictField, EmbeddedDocumentField, TagListField, DateTimeField
 from core.database.database import Node
 from core.observables import ObservableTag, Tag
-from core.entities import Entity
 from core.errors import ObservableValidationError
 from core.database.errors import DoesNotExist
 
@@ -50,7 +49,7 @@ class Observable(Node):
 
     exclude_fields = ['sources', 'context', 'last_analyses', 'created', 'attached_files', 'last_tagged']
 
-    collection_name = "observable"
+    _collection_name = "observable"
 
     meta = {
         "allow_inheritance": True,
@@ -280,6 +279,7 @@ class Observable(Node):
                 extra_tags = tag.produces + [tag]
 
                 # search for related entities and link them
+                from core.entities import Entity
                 for e in Entity.objects(tags__in=[tag.name]):
                     self.active_link_to(e, 'Tagged', 'tags', clean_old=False)
 

@@ -29,7 +29,7 @@ class ScheduleEntry(YetiDocument):
     # This should be defined in subclasses, to set the field values
     default_values = None
 
-    collection_name = "schedule_entry"
+    _collection_name = "schedule_entry"
     def update_status(self, status):
         self.status = status
         self.save()
@@ -47,7 +47,7 @@ class OneShotEntry(YetiDocument):
     # This should be defined in subclasses, to set the field values
     default_values = None
 
-    collection_name = 'one_shot_entry'
+    _collection_name = 'one_shot_entry'
 
 class Scheduler(BaseScheduler):
 

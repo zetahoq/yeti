@@ -66,8 +66,12 @@ class YetiDocumentMetaClass(type):
 
 
 class YetiDocument(BackendDocument):
-    meta = {"abstract": True}
+    _collection_name = None
     __metaclass__ = YetiDocumentMetaClass
+
+    @classmethod
+    def collection_name(klass):
+        return klass._collection_name or klass.__name__.lower()
 
 
 class LinkHistory(YetiDocument):

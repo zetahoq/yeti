@@ -84,16 +84,24 @@ class ReferenceField(GenericField):
         self._class = reference_class
 
     def __get__(self, obj, objtype):
-        collection = self.value['collection']
-        _id = self.value['_id']
-        return BackendDocument.get_from_collection(collection, _id)
+        if not self.value:
+            return
+        if isinstance(self.value, BackendDocument):
+            return self.value
+        elif isinstance(self.value, dict):
+            collection = self.value['collection']
+            _id = self.value['_id']
+            bson = BackendDocument.get_from_collection(collection, _id)
+            return self._class._from_bson(bson)
 
     def __set__(self, obj, value):
-        d = {
-            "id": value.id,
-            "collection": value.collection_name,
-        }
-        self.value = d
+        if isinstance(value, BackendDocument) or value is None:
+            self.value = value
+        elif isinstance(value, dict):
+            self.value = {
+                "_id": value['_id'],
+                "collection": self._class.collection_name()
+            }
 
 class EmbeddedDocumentField(GenericField):
     def __init__(self, embedded_class, *args, **kwargs):
