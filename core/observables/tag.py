@@ -38,7 +38,10 @@ class Tag(Node):
         return self.save()
 
     def add_produces(self, tags):
-        self.produces = [Tag.get_or_create(name=t) for t in iterify(tags)]
+        tags = [Tag.get_or_create(name=t) for t in iterify(tags)]
+        print "Adding produces", tags
+        self.produces = tags # This modifies the whole class. need to use _data like in mongoneinge :( 
+        import pdb; pdb.set_trace()
         return self.save()
 
     def clean(self):

@@ -17,6 +17,7 @@ class GenericField(BaseField):
         self._verbose = verbose_name
 
     def __get__(self, obj, objtype):
+        print "Fetching"
         if self.value is None and self._default is not None:
             self.value = self._default
         if callable(self.value):

@@ -77,9 +77,9 @@ e = Malware(name="Locky").save()
 e.family = ransomware
 e.save()
 
+t1 = Tag.get_or_create(name="zeus")
+t1.add_produces(["crimeware", "banker", "malware"])
 exit() # Something bad happens after this.
-
-t1 = Tag.get_or_create(name="zeus").add_produces(["crimeware", "banker", "malware"])
 t2 = Tag.get_or_create(name="banker").add_produces(["crimeware", "malware"])
 t3 = Tag.get_or_create(name="c2")
 t3.add_replaces(["c&c", "cc"])

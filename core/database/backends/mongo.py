@@ -57,6 +57,8 @@ mongo_query_op_re = re.compile(r"\.(?P<op>{})$".format("|".join(mongo_query_oper
 mongo_update_op_re = re.compile(r"^(?P<op>{})\.".format("|".join(mongo_update_operators)))
 
 def obj_to_bson(obj, field=None):
+    if not obj:
+        return obj
     if isinstance(obj, (list, tuple)):
         obj = [obj_to_bson(v) for v in obj]
     if isinstance(obj, (dict)):
