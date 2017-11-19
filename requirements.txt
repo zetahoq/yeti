@@ -15,6 +15,7 @@ tldextract
 git+https://github.com/joepie91/python-whois#egg=pythonwhois
 ipwhois
 blinker
+pyyaml
 simplejson
 yara-python
 redis

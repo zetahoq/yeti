@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
 from core.web.frontend.generic import GenericView
-from core.indicators import Indicator, Regex, Yara
+from core.indicators import Indicator, Regex, Yara, Sigma
 from core.entities import Entity
 
 
@@ -10,6 +10,7 @@ class IndicatorView(GenericView):
     subclass_map = {
         'regex': Regex,
         'yara': Yara,
+        'sigma': Sigma,
     }
 
     def post_save(self, e, request):

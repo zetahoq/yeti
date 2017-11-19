@@ -90,7 +90,7 @@
             <li class="{% if url_for("frontend.IndicatorView:index") in request.path and "/new/" not in request.path %}active{%endif%} dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Indicators <span class="caret"></span></a>
               <ul class="dropdown-menu">
-                {% for name, label in [("regex", "Regular expressions"), ("yara", "Yara rules")] %}
+                {% for name, label in [("regex", "Regular expressions"), ("yara", "Yara rules"), ("sigma", "Sigma rules")] %}
                 <li><a onclick="location.reload()" href="{{ url_for('frontend.IndicatorView:index') }}#{{name}}">{{label}}</a></li>
                 {% endfor %}
               </ul>
@@ -125,7 +125,7 @@
                 {% endif %}
                 {% if current_user.has_permission("indicator", "write") %}
                   <li class="dropdown-header">New indicator</li>
-                  {% for name, label in [("regex", "Regular expression"), ("yara", "Yara rule")] %}
+                  {% for name, label in [("regex", "Regular expression"), ("yara", "Yara rule"), ("sigma", "Sigma rule")] %}
                   <li><a href="{{ url_for('frontend.IndicatorView:new_subclass', subclass=name) }}">{{label}}</a></li>
                   {% endfor %}
                 {% endif %}
