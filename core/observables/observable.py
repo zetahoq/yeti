@@ -61,6 +61,7 @@ class Observable(Node):
     ]
 
     meta = {
+        "shard_key": ('value', ),
         "allow_inheritance":
             True,
         "indexes": [
