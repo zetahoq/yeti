@@ -39,8 +39,10 @@ readability-lxml = "*"
 python-dateutil = "*"
 libmagic = "*"
 maclookup = "*"
+pyopenssl = "*"
 
 [dev-packages]
+pylint = "<2.0.0"
 
 [requires]
 python_version = "2.7"
