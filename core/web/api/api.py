@@ -1,9 +1,12 @@
 from __future__ import unicode_literals
 
-from flask import Blueprint
-from flask_negotiation import Render
-from flask_negotiation.renderers import renderer, template_renderer
+import logging
 from json import dumps
+
+from flask import Blueprint, request
+from flask_negotiation import Render
+from flask_negotiation.renderers import renderer, TemplateRenderer
+from jinja2.exceptions import TemplateNotFound
 
 from core.web.json import to_json, recursive_encoder
 
@@ -16,15 +19,28 @@ api = Blueprint("api", __name__, template_folder="templates")
 # CORS(api, resources={r"*": {"origins": "*"}})
 
 
+class CautiousTemplateRenderer(TemplateRenderer):
+    """Renderer that falls back to JSON if templates aren't found."""
+
+    def render(self, data, template=None, ctx=None):
+        try:
+            return super(CautiousTemplateRenderer,
+                         self).render(data, template, ctx)
+        except TemplateNotFound:
+            return bson_renderer(data, template, ctx)
+
+
+# pylint: disable=unused-argument
 @renderer('application/json')
 def bson_renderer(objects, template=None, ctx=None):
     data = recursive_encoder(objects)
     return dumps(data, default=to_json)
 
 
-render = Render(renderers=[template_renderer, bson_renderer])
+render = Render(renderers=[bson_renderer, CautiousTemplateRenderer()])
 render_json = Render(renderers=[bson_renderer])
 
+# pylint: disable=wrong-import-position
 from core.web.api.observable import ObservableSearch, Observable
 from core.web.api.entity import Entity, EntitySearch
 from core.web.api.tag import Tag
